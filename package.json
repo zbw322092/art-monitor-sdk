@@ -1,0 +1,22 @@
+{
+  "name": "art-monitor-sdk",
+  "version": "0.0.1",
+  "description": "frontend monitoring client side SDK",
+  "author": "Bowen Zhong <zbw322092@hotmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node_modules/.bin/rollup -c -w"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.0",
+    "@babel/preset-env": "^7.2.0",
+    "rollup": "^0.67.4",
+    "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-uglify": "^6.0.0",
+    "ts-node": "^7.0.1",
+    "tslib": "^1.9.3",
+    "tslint": "^5.11.0",
+    "typescript": "^3.2.2"
+  }
+}
