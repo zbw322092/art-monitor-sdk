@@ -35,7 +35,8 @@
     "no-unused-variable": [
       true
     ],
-    "curly": false
+    "curly": false,
+    "eofline": false
   },
   "rulesDirectory": []
 }
