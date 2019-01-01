@@ -1,3 +1,5 @@
+import { supportsConstructableEventTarget } from './support';
+
 class EventTargetShim {
   constructor() {
     this.registry = {};
@@ -43,13 +45,4 @@ class EventTargetShim {
   }
 }
 
-let eventTargetSupport = true;
-if (EventTarget) {
-  const eventTarget = new EventTarget();
-  eventTargetSupport = !!(eventTarget.constructor &&
-    eventTarget.addEventListener &&
-    eventTarget.removeEventListener &&
-    eventTarget.dispatchEvent);
-}
-
-export default eventTargetSupport ? EventTarget : EventTargetShim;
+export default supportsConstructableEventTarget ? EventTarget : EventTargetShim;
