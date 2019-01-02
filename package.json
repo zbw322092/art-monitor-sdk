@@ -7,7 +7,7 @@
   "scripts": {
     "serve:static": "node_modules/.bin/static-server dist --port 9001 --cors '*' --no-cache",
     "serve:rollup": "node_modules/.bin/rollup -c -w",
-    "dev": "node_modules/.bin/npm-run-all serve:*"
+    "dev": "node_modules/.bin/npm-run-all --parallel serve:*"
   },
   "devDependencies": {
     "@babel/core": "^7.2.0",
