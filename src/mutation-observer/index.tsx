@@ -1,22 +1,56 @@
 import unique from '../utils/unique-selector';
 
 const targetNode = document.querySelector('body');
-const tipsTitle = document.querySelector('head > meta:nth-child(5)');
 
-console.log('tipsTitle: ', tipsTitle);
-if (tipsTitle) {
-  const selector = unique(tipsTitle);
-  console.log('tipsTitle selector: ', selector);
-  const elem = document.querySelectorAll(selector);
-  if (elem.length === 1 && elem[0] === tipsTitle) {
-    console.log('it is unique!');
-  } else {
-    console.log('wrong');
+const isNodeNotElement = (node: Node | Element) => {
+  return node instanceof Node && !(node instanceof Element);
+};
+
+const getNodeInfo = (node: Node) => {
+  if (isNodeNotElement(node)) {
+    if (node.parentElement) {
+      return unique(node.parentElement) + ', nodeValue: ' + node.nodeValue;
+    } else { return ''; }
   }
-}
 
-const callback: MutationCallback = (mutations) => {
-  console.log('mutations: ', mutations);
+  return unique(node as Element);
+};
+
+const handleNode = (node: NodeList | Node) => {
+  if (node instanceof Node) {
+    return getNodeInfo(node);
+  }
+  return Array.prototype.map.call(node, (n: Node | Element) => {
+    return getNodeInfo(n);
+  });
+};
+
+const consoleMutation = (mutationRecord: MutationRecord) => {
+  // console.log(mutationRecord);
+  const target = handleNode(mutationRecord.target);
+  const addedNodes = handleNode(mutationRecord.addedNodes);
+  const removedNodes = handleNode(mutationRecord.removedNodes);
+
+  const nextSibling = mutationRecord.nextSibling ? handleNode(mutationRecord.nextSibling) : null;
+  const previousSibling = mutationRecord.previousSibling ? handleNode(mutationRecord.previousSibling) : null;
+  console.log(
+    'timestamp: ' + performance.now() + ', ' +
+    'type: ' + mutationRecord.type + ', ' +
+    'target: ' + target + ', ' +
+    'addedNode: ' + JSON.stringify(addedNodes) + ', ' +
+    'removedNodes: ' + JSON.stringify(removedNodes) + ', ' +
+    'attributeName: ' + mutationRecord.attributeName + ', ' +
+    'attributeNamespace: ' + mutationRecord.attributeNamespace + ', ' +
+    'previousSibling: ' + previousSibling + ', ' +
+    'nextSibling: ' + nextSibling + ', ' +
+    'oldValue: ' + mutationRecord.oldValue + ', '
+  );
+};
+
+const callback: MutationCallback = (mutations: MutationRecord[]) => {
+  mutations.forEach((mutation) => {
+    consoleMutation(mutation);
+  });
 };
 const config: MutationObserverInit = {
   attributes: true,

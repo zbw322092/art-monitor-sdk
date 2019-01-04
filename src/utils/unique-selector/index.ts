@@ -36,8 +36,9 @@ const getUniqueSelector = (
   if (isUnique(element, tag)) {
     return tag;
   }
-  if (classes && attrs && isUnique(element, classes + attrs + tag)) {
-    return classes + attrs + tag;
+
+  if (classes && attrs && isUnique(element, classes + attrs + ' ' + tag)) {
+    return classes + attrs + ' ' + tag;
   }
 
   return null;
