@@ -1,5 +1,7 @@
 import unique from '../utils/unique-selector';
-import idb from '../idb';
+import { IDBStore } from '../data-store/IDBStore';
+
+const iDBStore = new IDBStore('qnn-mkt', 'mutations', 'id');
 
 const targetNode = document.querySelector('body');
 
@@ -34,6 +36,23 @@ const consoleMutation = (mutationRecord: MutationRecord) => {
 
   const nextSibling = mutationRecord.nextSibling ? handleNode(mutationRecord.nextSibling) : null;
   const previousSibling = mutationRecord.previousSibling ? handleNode(mutationRecord.previousSibling) : null;
+
+  const mutaionLog = {
+    timestamp: performance.now(),
+    type: mutationRecord.type,
+    target,
+    addedNode: JSON.stringify(addedNodes),
+    removedNodes: JSON.stringify(removedNodes),
+    attributeName: mutationRecord.attributeName,
+    attributeNamespace: mutationRecord.attributeNamespace,
+    previousSibling,
+    nextSibling,
+    oldValue: mutationRecord.oldValue
+  };
+
+  iDBStore.set(mutaionLog).then(() => {
+    console.log('record added');
+  });
   console.log(
     'timestamp: ' + performance.now() + ', ' +
     'type: ' + mutationRecord.type + ', ' +
@@ -77,8 +96,3 @@ const mutationObserver = new MutationObserver(callback);
 if (targetNode) {
   mutationObserver.observe(targetNode, config);
 }
-
-idb.open('kv', 1)
-  .then((db) => {
-    console.log('db: ', db);
-  });

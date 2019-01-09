@@ -2,4 +2,4 @@ import './mutation-observer';
 import './events';
 import './performance';
 import './utils/lifecycle';
-import './idb';
+import './utils/idb';

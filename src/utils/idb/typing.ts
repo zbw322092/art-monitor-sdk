@@ -98,16 +98,16 @@ export interface HasCursor<TValue, TKey> {
 	 * So in the mean time, iterateCursor maps to openCursor, takes identical arguments, plus an additional callback that receives an IDBCursor
 	 */
 	iterateCursor(callback: (c: ICursor<TValue, TKey>) => void): void;
-	iterateCursor(range: IDBKeyRange | IDBValidKey | null, callback: (c: ICursor<TValue, TKey>) => void): void;
-	iterateCursor(range: IDBKeyRange | IDBValidKey | null, direction: 'next' | 'nextunique' | 'prev' | 'prevunique', callback: (c: ICursor<TValue, TKey>) => void): void;
+	// iterateCursor(range: IDBKeyRange | IDBValidKey | null, callback: (c: ICursor<TValue, TKey>) => void): void;
+	// iterateCursor(range: IDBKeyRange | IDBValidKey | null, direction: 'next' | 'nextunique' | 'prev' | 'prevunique', callback: (c: ICursor<TValue, TKey>) => void): void;
 
 	/** Due to the microtask issues in some browsers, iterating over a cursor using promises doesn't always work.
 	 * So in the mean time, iterateKeyCursor maps to openKeyCursor, takes identical arguments, plus an additional
 	 * callback that receives an IDBCursor
 	 */
 	iterateKeyCursor(callback: (c: ICursor<TValue, TKey>) => void): void;
-	iterateKeyCursor(range: IDBKeyRange | IDBValidKey | null, callback: (c: ICursor<TValue, TKey>) => void): void;
-	iterateKeyCursor(range: IDBKeyRange | IDBValidKey | null, direction: 'next' | 'nextunique' | 'prev' | 'prevunique', callback: (c: ICursor<TValue, TKey>) => void): void;
+	// iterateKeyCursor(range: IDBKeyRange | IDBValidKey | null, callback: (c: ICursor<TValue, TKey>) => void): void;
+	// iterateKeyCursor(range: IDBKeyRange | IDBValidKey | null, direction: 'next' | 'nextunique' | 'prev' | 'prevunique', callback: (c: ICursor<TValue, TKey>) => void): void;
 }
 
 /** Wrapper of IDBObjectStore that presents the asynchronous operations as Promises. */
