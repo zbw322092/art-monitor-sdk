@@ -1,5 +1,3 @@
-import { isElement } from './isElement';
-
 /**
  * Returns the selectors based on the position of the element relative to its siblings
  * @param {Element} element

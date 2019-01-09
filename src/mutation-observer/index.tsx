@@ -1,4 +1,5 @@
 import unique from '../utils/unique-selector';
+import idb from '../idb';
 
 const targetNode = document.querySelector('body');
 
@@ -25,8 +26,8 @@ const handleNode = (node: NodeList | Node) => {
   });
 };
 
+let styleAttrMutationTimeout;
 const consoleMutation = (mutationRecord: MutationRecord) => {
-  // console.log(mutationRecord);
   const target = handleNode(mutationRecord.target);
   const addedNodes = handleNode(mutationRecord.addedNodes);
   const removedNodes = handleNode(mutationRecord.removedNodes);
@@ -45,10 +46,20 @@ const consoleMutation = (mutationRecord: MutationRecord) => {
     'nextSibling: ' + nextSibling + ', ' +
     'oldValue: ' + mutationRecord.oldValue + ', '
   );
+  if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'style') {
+    styleAttrMutationTimeout = window.setTimeout(() => {
+      window.clearTimeout(styleAttrMutationTimeout);
+      styleAttrMutationTimeout = null;
+    }, 1000);
+  }
 };
 
 const callback: MutationCallback = (mutations: MutationRecord[]) => {
   mutations.forEach((mutation) => {
+    if (mutation.type === 'attributes' &&
+      mutation.attributeName === 'style' &&
+      styleAttrMutationTimeout
+    ) { return; }
     consoleMutation(mutation);
   });
 };
@@ -64,11 +75,10 @@ const config: MutationObserverInit = {
 const mutationObserver = new MutationObserver(callback);
 
 if (targetNode) {
-  targetNode.addEventListener('click', (event) => {
-    console.log(event);
-  });
-  window.addEventListener('scroll', (event) => {
-    console.log(event);
-  });
   mutationObserver.observe(targetNode, config);
 }
+
+idb.open('kv', 1)
+  .then((db) => {
+    console.log('db: ', db);
+  });

@@ -36,7 +36,10 @@
       true
     ],
     "curly": false,
-    "eofline": false
+    "eofline": false,
+    "interface-name": false,
+    "indent": false,
+    "ban-types": false
   },
   "rulesDirectory": []
 }
