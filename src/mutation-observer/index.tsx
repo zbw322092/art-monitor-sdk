@@ -1,5 +1,6 @@
 import unique from '../utils/unique-selector';
 import { IDBStore } from '../data-store/IDBStore';
+import { LoggerMutation } from '../logger/LoggerMutation';
 
 const iDBStore = new IDBStore('qnn-mkt', 'mutations', 'id');
 
@@ -23,49 +24,39 @@ const handleNode = (node: NodeList | Node) => {
   if (node instanceof Node) {
     return getNodeInfo(node);
   }
-  return Array.prototype.map.call(node, (n: Node | Element) => {
-    return getNodeInfo(n);
-  });
+  return JSON.stringify(
+    Array.prototype.map.call(node, (n: Node | Element) => {
+      return getNodeInfo(n);
+    })
+  );
 };
 
 let styleAttrMutationTimeout;
 const consoleMutation = (mutationRecord: MutationRecord) => {
-  const target = handleNode(mutationRecord.target);
-  const addedNodes = handleNode(mutationRecord.addedNodes);
-  const removedNodes = handleNode(mutationRecord.removedNodes);
+  const { type, target, addedNodes, removedNodes, attributeName, attributeNamespace,
+    nextSibling, previousSibling, oldValue } = mutationRecord;
+  const targetSelector = handleNode(target);
+  const addedNodesSelector = handleNode(addedNodes);
+  const removedNodesSelector = handleNode(removedNodes);
 
-  const nextSibling = mutationRecord.nextSibling ? handleNode(mutationRecord.nextSibling) : null;
-  const previousSibling = mutationRecord.previousSibling ? handleNode(mutationRecord.previousSibling) : null;
+  const nextSiblingSelector = nextSibling ? handleNode(nextSibling) : null;
+  const previousSiblingSelector = previousSibling ? handleNode(previousSibling) : null;
 
-  const mutaionLog = {
-    timestamp: performance.now(),
-    type: mutationRecord.type,
-    target,
-    addedNode: JSON.stringify(addedNodes),
-    removedNodes: JSON.stringify(removedNodes),
-    attributeName: mutationRecord.attributeName,
-    attributeNamespace: mutationRecord.attributeNamespace,
-    previousSibling,
-    nextSibling,
-    oldValue: mutationRecord.oldValue
-  };
-
-  iDBStore.set(mutaionLog).then(() => {
-    console.log('record added');
-  });
-  console.log(
-    'timestamp: ' + performance.now() + ', ' +
-    'type: ' + mutationRecord.type + ', ' +
-    'target: ' + target + ', ' +
-    'addedNode: ' + JSON.stringify(addedNodes) + ', ' +
-    'removedNodes: ' + JSON.stringify(removedNodes) + ', ' +
-    'attributeName: ' + mutationRecord.attributeName + ', ' +
-    'attributeNamespace: ' + mutationRecord.attributeNamespace + ', ' +
-    'previousSibling: ' + previousSibling + ', ' +
-    'nextSibling: ' + nextSibling + ', ' +
-    'oldValue: ' + mutationRecord.oldValue + ', '
+  const mutaionLog = new LoggerMutation(
+    type, targetSelector, addedNodesSelector, removedNodesSelector, attributeName,
+    attributeNamespace, previousSiblingSelector, nextSiblingSelector, oldValue
   );
-  if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'style') {
+
+  iDBStore.set(mutaionLog)
+    .then(() => {
+      console.log('record added');
+    })
+    .catch((err) => {
+      console.log('idb err: ', err);
+    });
+  console.log(mutaionLog);
+
+  if (type === 'attributes' && attributeName === 'style') {
     styleAttrMutationTimeout = window.setTimeout(() => {
       window.clearTimeout(styleAttrMutationTimeout);
       styleAttrMutationTimeout = null;
