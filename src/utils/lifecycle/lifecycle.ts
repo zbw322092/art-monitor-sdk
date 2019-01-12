@@ -112,7 +112,7 @@ const getCurrentState = (): string => {
 /**
  * Class definition for the exported, singleton lifecycle instance.
  */
-export default class Lifecycle extends EventTarget {
+class Lifecycle extends EventTarget {
   /**
    * Initializes state, state history, and adds event listeners to monitor
    * state changes.
@@ -248,3 +248,5 @@ export default class Lifecycle extends EventTarget {
     }
   }
 }
+
+export default Lifecycle;

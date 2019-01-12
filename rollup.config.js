@@ -1,6 +1,6 @@
 import typescript from 'rollup-plugin-typescript';
 import babel from 'rollup-plugin-babel';
-import { uglify } from "rollup-plugin-uglify";
+import { terser } from 'rollup-plugin-terser';
 
 export default {
   input: './src/index.ts',
@@ -12,15 +12,13 @@ export default {
   plugins: [
     typescript(),
     babel({
+      include: ['src/**/*'],
       exclude: 'node_modules/**'
     }),
-    uglify({
-      sourcemap: false,
-      compress: {
-        warnings: true,
-        dead_code: true,
-        drop_debugger: true,
-        drop_console: false
+    terser({
+      compress: true,
+      mangle: {
+        toplevel: true,
       }
     })
   ]
