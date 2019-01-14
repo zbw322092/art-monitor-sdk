@@ -2,8 +2,8 @@ import { LoggerUIEvent } from './LoggerUIEvent';
 import { getEventTargetInfo } from './getEventTargetInfo';
 
 export class LoggerTouchEvent extends LoggerUIEvent {
-  constructor(touchEvent: TouchEvent) {
-    super(touchEvent);
+  constructor(trackType: string , touchEvent: TouchEvent) {
+    super(trackType, touchEvent);
 
     this.altKey = touchEvent.altKey;
     this.changedTouches = JSON.stringify(formatTouchList(touchEvent.changedTouches));

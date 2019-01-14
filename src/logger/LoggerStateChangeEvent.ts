@@ -2,8 +2,8 @@ import { LoggerEvent } from './LoggerEvent';
 import StateChangeEvent from '../utils/lifecycle/StateChangeEvent';
 
 export class LoggerStateChangeEvent extends LoggerEvent {
-  constructor(stateChangeEvent: StateChangeEvent) {
-    super(stateChangeEvent as any);
+  constructor(trackType: string, stateChangeEvent: StateChangeEvent) {
+    super(trackType, stateChangeEvent as any);
 
     this.newState = stateChangeEvent.newState;
     this.prevState = stateChangeEvent.prevState;

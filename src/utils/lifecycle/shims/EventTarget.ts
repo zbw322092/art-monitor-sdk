@@ -9,14 +9,14 @@ class EventTargetShim {
   /**
    * @see https://dom.spec.whatwg.org/#dom-eventtarget-addeventlistener
    */
-  public addEventListener(type: string, listener: EventListener, opts = false): void {
+  public addEventListener(type: string, listener: EventListener): void {
     this.getRegistry(type).push(listener);
   }
 
   /**
    * @see https://dom.spec.whatwg.org/#dom-eventtarget-removeeventlistener
    */
-  public removeEventListener(type: string, listener: EventListener, opts = false): void {
+  public removeEventListener(type: string, listener: EventListener): void {
     const typeRegistery = this.getRegistry(type);
     const handlerIndex = typeRegistery.indexOf(listener);
     if (handlerIndex > -1) {

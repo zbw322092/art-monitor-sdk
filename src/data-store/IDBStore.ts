@@ -1,4 +1,4 @@
-import idb from '../utils/idb';
+import idb from '../utils/idb/index';
 import { IDB } from '../utils/idb/typing';
 
 export class IDBStore {

@@ -1,10 +1,11 @@
 import { LoggerTouchEvent } from '../logger/LoggerTouchEvent';
+import { TRACKTYPE } from '../constants/TRACKTYPE';
 
 const touchEvents = ['touchstart', 'touchend'];
 
 touchEvents.forEach((eventName) => {
   window.addEventListener(eventName, (event) => {
-    const touchLog = new LoggerTouchEvent(event as TouchEvent);
+    const touchLog = new LoggerTouchEvent(TRACKTYPE.TOUCHEVENT, event as TouchEvent);
     console.log('touchLog: ', touchLog);
   });
 });
@@ -12,7 +13,7 @@ touchEvents.forEach((eventName) => {
 let touchmoveTimeout: number | null;
 window.addEventListener('touchmove', (event) => {
   if (touchmoveTimeout) { return; }
-  const touchmoveLog = new LoggerTouchEvent(event);
+  const touchmoveLog = new LoggerTouchEvent(TRACKTYPE.TOUCHEVENT, event);
   console.log('touchmoveLog: ', touchmoveLog);
 
   touchmoveTimeout = window.setTimeout(() => {

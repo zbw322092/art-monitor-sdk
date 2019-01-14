@@ -1,20 +1,44 @@
 import LoggerBase from './LoggerBase';
+import unique from '../utils/unique-selector/index';
+
+const isNodeNotElement = (node: Node | Element) => {
+  return node instanceof Node && !(node instanceof Element);
+};
+
+const getNodeInfo = (node: Node) => {
+  if (isNodeNotElement(node)) {
+    if (node.parentElement) {
+      return unique(node.parentElement) + ', nodeValue: ' + node.nodeValue;
+    } else { return ''; }
+  }
+
+  return unique(node as Element);
+};
+
+const handleNode = (node: NodeList | Node) => {
+  if (node instanceof Node) {
+    return getNodeInfo(node);
+  }
+  return JSON.stringify(
+    Array.prototype.map.call(node, (n: Node | Element) => {
+      return getNodeInfo(n);
+    })
+  );
+};
 
 export class LoggerMutation extends LoggerBase {
-  constructor(
-    type: string, target: string, addedNode: string, removedNodes: string, attributeName: string | null,
-    attributeNamespace: string | null, previousSibling: string | null, nextSibling: string | null, oldValue: string | null
-  ) {
-    super();
-    this.type = type;
-    this.target = target;
-    this.addedNode = addedNode;
-    this.removedNodes = removedNodes;
-    this.attributeName = attributeName;
-    this.attributeNamespace = attributeNamespace;
-    this.previousSibling = previousSibling;
-    this.nextSibling = nextSibling;
-    this.oldValue = oldValue;
+  constructor(trackType: string, mutationRecord: MutationRecord) {
+    super(trackType);
+
+    this.type = mutationRecord.type;
+    this.target = handleNode(mutationRecord.target);
+    this.addedNode = handleNode(mutationRecord.addedNodes);
+    this.removedNodes = handleNode(mutationRecord.removedNodes);
+    this.attributeName = mutationRecord.attributeName;
+    this.attributeNamespace = mutationRecord.attributeNamespace;
+    this.previousSibling = mutationRecord.previousSibling ? handleNode(mutationRecord.previousSibling) : null;
+    this.nextSibling = mutationRecord.nextSibling ? handleNode(mutationRecord.nextSibling) : null;
+    this.oldValue = mutationRecord.oldValue;
   }
 
   public type: string;

@@ -2,8 +2,8 @@ import { LoggerUIEvent } from './LoggerUIEvent';
 import { getEventTargetInfo } from './getEventTargetInfo';
 
 export class LoggerMouseEvent extends LoggerUIEvent {
-  constructor(mouseEvent: MouseEvent) {
-    super(mouseEvent);
+  constructor(trackType: string, mouseEvent: MouseEvent) {
+    super(trackType, mouseEvent);
 
     this.altKey = mouseEvent.altKey;
     this.button = mouseEvent.button;
