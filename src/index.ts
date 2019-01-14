@@ -1,7 +1,7 @@
 import './constants/TRACKID';
 
+import './xhr-interceptor';
 import './mutation-observer';
-// import './utils/lifecycle';
 import './events';
 import './performance';
 import './utils/idb';
