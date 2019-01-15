@@ -1,52 +1,49 @@
 import idb from '../utils/idb/index';
-import { IDB } from '../utils/idb/typing';
+import { IDB, IUpgradeDB } from '../utils/idb/typing';
+import { DBVERSION, DBNMAE, OBJECTNAME, KETPATH } from '../constants/DB';
 
 export class IDBStore {
-  constructor(dbName: string, objName: string, keyPath: string) {
-    this.dbPromise = idb.open(dbName, 1, (upgradeDB) => {
-      upgradeDB.createObjectStore(objName, { keyPath, autoIncrement: true });
-    });
-    this.objName = objName;
+  constructor(dbName: string, upgradeCallback: (upgradeDB: IUpgradeDB) => any) {
+    this.dbPromise = idb.open(dbName, DBVERSION, upgradeCallback);
   }
   private dbPromise: Promise<IDB>;
-  private objName: string;
 
-  public get = (key: string): Promise<any> => {
+  public get = (objName: string, key: string): Promise<any> => {
     return this.dbPromise.then((db) => {
-      return db.transaction(this.objName)
-        .objectStore(this.objName).get(key);
+      return db.transaction(objName)
+        .objectStore(objName).get(key);
     });
   }
 
-  public set = (val: any): Promise<void> => {
+  public set = (objName: string, val: any): Promise<void> => {
     return this.dbPromise.then((db) => {
-      const tx = db.transaction(this.objName, 'readwrite');
-      tx.objectStore(this.objName).put(val);
+      const tx = db.transaction(objName, 'readwrite');
+      tx.objectStore(objName).put(val);
       return tx.complete;
     });
   }
 
-  public delete = (key: string): Promise<void> => {
+  public delete = (objName: string, key: string): Promise<void> => {
     return this.dbPromise.then((db) => {
-      const tx = db.transaction(this.objName, 'readwrite');
-      tx.objectStore(this.objName).delete(key);
+      const tx = db.transaction(objName, 'readwrite');
+      tx.objectStore(objName).delete(key);
       return tx.complete;
     });
   }
 
-  public clear = (): Promise<void> => {
+  public clear = (objName: string): Promise<void> => {
     return this.dbPromise.then((db) => {
-      const tx = db.transaction(this.objName, 'readwrite');
-      tx.objectStore(this.objName).clear();
+      const tx = db.transaction(objName, 'readwrite');
+      tx.objectStore(objName).clear();
       return tx.complete;
     });
   }
 
-  public keys = (): Promise<string[]> => {
+  public keys = (objName: string): Promise<string[]> => {
     return this.dbPromise.then((db) => {
-      const tx = db.transaction(this.objName);
+      const tx = db.transaction(objName);
       const keys: string[] = [];
-      const store = tx.objectStore(this.objName);
+      const store = tx.objectStore(objName);
 
       // This would be store.getAllKeys(), but it isn't supported by Edge or Safari.
       // openKeyCursor isn't supported by Safari, so we fall back
@@ -62,3 +59,10 @@ export class IDBStore {
     });
   }
 }
+
+export const iDBStoreInstance = new IDBStore(DBNMAE, (upgradeDB) => {
+  console.log(111222);
+  if (!upgradeDB.objectStoreNames.contains(OBJECTNAME)) {
+    upgradeDB.createObjectStore(OBJECTNAME, { keyPath: KETPATH, autoIncrement: true });
+  }
+});

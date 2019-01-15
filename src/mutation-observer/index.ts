@@ -1,27 +1,26 @@
-import { IDBStore } from '../data-store/IDBStore';
 import { LoggerMutation } from '../logger/LoggerMutation';
 import { TRACKTYPE } from '../constants/TRACKTYPE';
-
-const iDBStore = new IDBStore('qnn-mkt', 'mutations', 'id');
+import { iDBStoreInstance } from '../data-store/IDBStore';
+import { OBJECTNAME } from '../constants/DB';
 
 const targetNode = document.querySelector('body');
 
-let styleAttrMutationTimeout;
+let styleAttrMutationTimeout: number | null;
 const storeMutation = (mutationRecord: MutationRecord) => {
   const mutaionLog = new LoggerMutation(TRACKTYPE.MUTATION, mutationRecord);
+  console.log('mutaion log', mutaionLog);
 
-  iDBStore.set(mutaionLog)
+  iDBStoreInstance.set(OBJECTNAME, mutaionLog)
     .then(() => {
-      console.log('record added');
+      console.log('mutaion log added');
     })
     .catch((err) => {
-      console.log('idb err: ', err);
+      console.log('mutaion log err: ', err);
     });
-  console.log(mutaionLog);
 
   if (mutationRecord.type === 'attributes' && mutationRecord.attributeName === 'style') {
     styleAttrMutationTimeout = window.setTimeout(() => {
-      window.clearTimeout(styleAttrMutationTimeout);
+      window.clearTimeout(styleAttrMutationTimeout as number);
       styleAttrMutationTimeout = null;
     }, 1000);
   }
