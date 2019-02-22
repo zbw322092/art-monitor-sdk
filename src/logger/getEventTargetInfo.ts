@@ -1,4 +1,4 @@
-import unique from '../utils/unique-selector';
+import unique from '../utils/unique-selector/index';
 
 export const getEventTargetInfo = (eventTarget: EventTarget | null): string | null => {
   if (eventTarget === null) {
