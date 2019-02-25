@@ -1,6 +1,7 @@
-import { proxyProperties, proxyRequestMethods } from './proxies';
+import { proxyProperties, proxyRequestMethods, proxyCursorRequestMethods } from './proxies';
 import { Index } from './DBIndex';
 import { IIndex } from './typing';
+import { Cursor } from './Cursor';
 
 export function ObjectStore(store: IDBObjectStore) {
   this._store = store;
@@ -31,4 +32,13 @@ proxyRequestMethods(ObjectStore, '_store', IDBObjectStore, [
   'getKey',
   'getAllKeys',
   'count'
+]);
+
+proxyCursorRequestMethods(ObjectStore, '_store', IDBObjectStore, [
+  'openCursor',
+  'openKeyCursor'
+], Cursor);
+
+proxyRequestMethods(ObjectStore, '_store', IDBObjectStore, [
+  'deleteIndex'
 ]);

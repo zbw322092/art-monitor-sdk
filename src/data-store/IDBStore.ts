@@ -1,6 +1,6 @@
 import idb from '../utils/idb/index';
 import { IDB, IUpgradeDB } from '../utils/idb/typing';
-import { DBVERSION, DBNMAE, OBJECTNAME, KETPATH } from '../constants/DB';
+import { DBVERSION, DBNAME, OBJECTNAME, KETPATH } from '../constants/DB';
 
 export class IDBStore {
   constructor(dbName: string, upgradeCallback: (upgradeDB: IUpgradeDB) => any) {
@@ -39,6 +39,10 @@ export class IDBStore {
     });
   }
 
+  public getDBPromise = () => {
+    return this.dbPromise;
+  }
+
   public keys = (objName: string): Promise<string[]> => {
     return this.dbPromise.then((db) => {
       const tx = db.transaction(objName);
@@ -58,11 +62,21 @@ export class IDBStore {
       });
     });
   }
+
+  public deleteDataBase (dbName: string): Promise<any> {
+    return idb.delete(dbName)
+      .then(() => {
+        console.log(`delete ${dbName} database successfully`);
+      })
+      .catch((err) => {
+        console.log(`delete ${dbName} database err: `, err);
+      });
+  }
 }
 
-export const iDBStoreInstance = new IDBStore(DBNMAE, (upgradeDB) => {
-  console.log(111222);
+export const iDBStoreInstance = new IDBStore(DBNAME, (upgradeDB) => {
   if (!upgradeDB.objectStoreNames.contains(OBJECTNAME)) {
-    upgradeDB.createObjectStore(OBJECTNAME, { keyPath: KETPATH, autoIncrement: true });
+    const objectStore = upgradeDB.createObjectStore(OBJECTNAME, { keyPath: KETPATH, autoIncrement: true });
+    objectStore.createIndex('timestamp', 'timestamp');
   }
 });

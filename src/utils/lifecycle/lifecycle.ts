@@ -1,12 +1,14 @@
 import EventTarget from './shims/EventTarget';
 import StateChangeEvent from './StateChangeEvent';
+import { PageState } from './enums/PageState';
+import { PageEvent } from './enums/PageEvent';
 
-const ACTIVE = 'active';
-const PASSIVE = 'passive';
-const HIDDEN = 'hidden';
-const FROZEN = 'frozen';
-// const DISCARDED = 'discarded'; Not used but show to completeness.
-const TERMINATED = 'terminated';
+const ACTIVE = PageState.ACTIVE;
+const PASSIVE = PageState.PASSIVE;
+const HIDDEN = PageState.HIDDEN;
+const FROZEN = PageState.FROZEN;
+// const DISCARDED = PageState.DISCARDED; Not used but show to completeness.
+const TERMINATED = PageState.TERMINATED;
 
 // Detect Safari to work around Safari-specific bugs.
 const safari = (window as any).safari;
@@ -15,16 +17,16 @@ const IS_SAFARI = typeof safari === 'object' && safari.pushNotification;
 const SUPPORTS_PAGE_TRANSITION_EVENTS = 'onpageshow' in self;
 
 const EVENTS = [
-  'focus',
-  'blur',
-  'visibilitychange',
-  'freeze',
-  'resume',
-  'pageshow',
+  PageEvent.focus,
+  PageEvent.blur,
+  PageEvent.visibilitychange,
+  PageEvent.freeze,
+  PageEvent.resume,
+  PageEvent.pageshow,
   // IE9-10 do not support the pagehide event, so we fall back to unload
   // Note: unload *MUST ONLY* be added conditionally, otherwise it will
   // prevent page navigation caching (a.k.a bfcache).
-  SUPPORTS_PAGE_TRANSITION_EVENTS ? 'pagehide' : 'unload'
+  SUPPORTS_PAGE_TRANSITION_EVENTS ? PageEvent.pagehide : PageEvent.unload
 ];
 
 const onbeforeunload = (event: Event) => {
