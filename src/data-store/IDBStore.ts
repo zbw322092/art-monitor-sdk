@@ -23,7 +23,7 @@ export class IDBStore {
     });
   }
 
-  public delete = (objName: string, key: string): Promise<void> => {
+  public delete = (objName: string, key: any): Promise<void> => {
     return this.dbPromise.then((db) => {
       const tx = db.transaction(objName, 'readwrite');
       tx.objectStore(objName).delete(key);
