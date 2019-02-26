@@ -1,4 +1,4 @@
-import { xhrInterceptor } from './xhr-interceptor';
+import { xhrInterceptor } from '../utils/xhr-interceptor/xhr-interceptor';
 import { LoggerXHR } from '../logger/LoggerXHR';
 import { TRACKTYPE } from '../constants/TRACKTYPE';
 import { iDBStoreInstance } from '../data-store/IDBStore';

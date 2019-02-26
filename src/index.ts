@@ -1,8 +1,9 @@
 import './constants/TRACKID';
 
-import './xhr-interceptor';
+import './interceptor';
 import './mutation-observer';
 import './events';
 import './performance';
 import './utils/idb';
 import './data-store/intervalClear';
+import './error-tracking/xhrReporter.ts';
