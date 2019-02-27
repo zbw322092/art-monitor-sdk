@@ -1,9 +1,9 @@
 import { iDBStoreInstance } from './IDBStore';
-import { OBJECTNAME, CLEARINTERVAL } from '../constants/DB';
+import { OBJECTNAME, CLEARINTERVAL, CLEARRANGELOW, CLEARRANGEHIGH, OFFSET } from '../constants/DB';
 
 window.setInterval(() => {
   const now = performance.now();
-  const range = IDBKeyRange.bound(now - (CLEARINTERVAL * 2), now - CLEARINTERVAL);
+  const range = IDBKeyRange.bound(now - CLEARRANGELOW - OFFSET, now - CLEARRANGEHIGH + OFFSET);
   let count = 0;
   let minIndex: number, maxIndex: number;
 
