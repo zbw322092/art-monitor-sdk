@@ -1,5 +1,5 @@
 import { LoggerEvent } from '../logger/LoggerEvent';
-import { TRACKTYPE } from '../constants/TRACKTYPE';
+import { TrackType } from '../enums/TrackType';
 import { iDBStoreInstance } from '../data-store/IDBStore';
 import { OBJECTNAME } from '../constants/DB';
 
@@ -7,7 +7,7 @@ let scrollTimeout: number | null;
 window.addEventListener('scroll', (event) => {
   if (scrollTimeout) { return; }
 
-  const scrollLog = new LoggerEvent(TRACKTYPE.EVENT, event);
+  const scrollLog = new LoggerEvent(TrackType.EVENT, event);
   console.log('scroll log: ', scrollLog);
 
   iDBStoreInstance.set(OBJECTNAME, scrollLog)
@@ -27,7 +27,7 @@ let resizeTimeout: number | null;
 window.addEventListener('resize', (event) => {
   if (resizeTimeout) { return; }
 
-  const resizeLog = new LoggerEvent(TRACKTYPE.EVENT, event);
+  const resizeLog = new LoggerEvent(TrackType.EVENT, event);
   console.log('resize log: ', resizeLog);
 
   iDBStoreInstance.set(OBJECTNAME, resizeLog)

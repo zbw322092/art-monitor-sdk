@@ -1,5 +1,5 @@
 import { LoggerMouseEvent } from '../logger/LoggerMouseEvent';
-import { TRACKTYPE } from '../constants/TRACKTYPE';
+import { TrackType } from '../enums/TrackType';
 import { iDBStoreInstance } from '../data-store/IDBStore';
 import { OBJECTNAME } from '../constants/DB';
 
@@ -7,7 +7,7 @@ const mouseEvents = ['click', 'dblclick'];
 
 mouseEvents.forEach((eventName) => {
   window.addEventListener(eventName, (event) => {
-    const clickLog = new LoggerMouseEvent(TRACKTYPE.MOUSEEVENT, event as MouseEvent);
+    const clickLog = new LoggerMouseEvent(TrackType.MOUSEEVENT, event as MouseEvent);
     console.log('click log: ', clickLog);
 
     iDBStoreInstance.set(OBJECTNAME, clickLog)

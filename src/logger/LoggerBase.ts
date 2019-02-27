@@ -1,10 +1,10 @@
 export default abstract class LoggerBase {
-  constructor(trackType: string) {
-    this.trackType = trackType;
+  constructor(TrackType: string) {
+    this.TrackType = TrackType;
   }
 
   public readonly timestamp: number = performance.now();
   public readonly trackId: string = (window as any).TRACKID;
-  public readonly trackType: string;
+  public readonly TrackType: string;
 
 }

@@ -1,8 +1,8 @@
 import { LoggerEvent } from './LoggerEvent';
 
 export class LoggerUIEvent extends LoggerEvent {
-  constructor(trackType: string, uiEvent: UIEvent) {
-    super(trackType, uiEvent);
+  constructor(TrackType: string, uiEvent: UIEvent) {
+    super(TrackType, uiEvent);
 
     const { detail } = uiEvent;
     this.detail = detail;

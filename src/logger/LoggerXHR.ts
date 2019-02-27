@@ -18,8 +18,8 @@ const handleXHRResponse = (xhr: XMLHttpRequest): string => {
 };
 
 export class LoggerXHR extends LoggerBase {
-  constructor(trackType: string, xhr: XMLHttpRequest) {
-    super(trackType);
+  constructor(TrackType: string, xhr: XMLHttpRequest) {
+    super(TrackType);
 
     this.responseURL = xhr.responseURL;
     this.status = xhr.status;

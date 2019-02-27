@@ -1,9 +1,10 @@
-export enum TRACKTYPE {
+export enum TrackType {
   'EVENT' = 'event',
   'KEYBOARDEVENT' = 'keyboardEvent',
   'MOUSEEVENT' = 'mouseEvent',
   'TOUCHEVENT' = 'touchEvent',
   'STATECHANGE' = 'statechange',
   'MUTATION' = 'mutation',
-  'XHRINTERCEPT' = 'XHRIntercept'
+  'XHRINTERCEPT' = 'XHRIntercept',
+  'ERROR' = 'error'
 }

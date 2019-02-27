@@ -1,8 +1,8 @@
 import { LoggerUIEvent } from './LoggerUIEvent';
 
 export class LoggerKeyboardEvent extends LoggerUIEvent {
-  constructor(trackType: string, keyboardEvent: KeyboardEvent) {
-    super(trackType, keyboardEvent);
+  constructor(TrackType: string, keyboardEvent: KeyboardEvent) {
+    super(TrackType, keyboardEvent);
 
     this.altKey = keyboardEvent.altKey;
     this.code = keyboardEvent.code;

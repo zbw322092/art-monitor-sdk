@@ -1,16 +1,18 @@
-import { iDBStoreInstance } from './IDBStore';
-import { OBJECTNAME, CLEARINTERVAL } from '../constants/DB';
+import { CLEARINTERVAL, OBJECTNAME } from '../constants/DB';
+import { iDBStoreInstance } from '../data-store/IDBStore';
+import { IObjectStore } from '../utils/idb/typing';
 
-window.setInterval(() => {
+export const getBehaviorRecords = (): Promise<any[]> => {
   const now = performance.now();
-  const range = IDBKeyRange.bound(now - (CLEARINTERVAL * 2), now - CLEARINTERVAL);
+  const range = IDBKeyRange.bound(now - CLEARINTERVAL, now);
   let count = 0;
   let minIndex: number, maxIndex: number;
+  let store: IObjectStore<any, any>;
 
-  iDBStoreInstance.getDBPromise()
+  return iDBStoreInstance.getDBPromise()
     .then((db) => {
       const transaction = db.transaction(OBJECTNAME);
-      const store = transaction.objectStore(OBJECTNAME);
+      store = transaction.objectStore(OBJECTNAME);
       const index = store.index('timestamp');
       return index.openCursor(range);
     }).then(function showRange(cursor) {
@@ -31,12 +33,13 @@ window.setInterval(() => {
         console.log('no new records');
         return;
       }
-      iDBStoreInstance.delete(OBJECTNAME, IDBKeyRange.bound(minIndex, maxIndex))
-        .then(() => {
-          console.log(`${count} records deleted`);
+      return store.getAll(IDBKeyRange.bound(minIndex, maxIndex))
+        .then((records) => {
+          console.log(`got ${count} records`);
+          return records;
         })
         .catch((err) => {
-          console.log(`delete record has err: `, err);
+          return err;
         });
     });
-}, CLEARINTERVAL);
+};

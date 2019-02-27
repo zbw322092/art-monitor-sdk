@@ -1,5 +1,5 @@
 import { LoggerTouchEvent } from '../logger/LoggerTouchEvent';
-import { TRACKTYPE } from '../constants/TRACKTYPE';
+import { TrackType } from '../enums/TrackType';
 import { iDBStoreInstance } from '../data-store/IDBStore';
 import { OBJECTNAME } from '../constants/DB';
 
@@ -7,7 +7,7 @@ const touchEvents = ['touchstart', 'touchend'];
 
 touchEvents.forEach((eventName) => {
   window.addEventListener(eventName, (event) => {
-    const touchLog = new LoggerTouchEvent(TRACKTYPE.TOUCHEVENT, event as TouchEvent);
+    const touchLog = new LoggerTouchEvent(TrackType.TOUCHEVENT, event as TouchEvent);
     console.log('touchLog: ', touchLog);
 
     iDBStoreInstance.set(OBJECTNAME, touchLog)
@@ -23,7 +23,7 @@ touchEvents.forEach((eventName) => {
 let touchmoveTimeout: number | null;
 window.addEventListener('touchmove', (event) => {
   if (touchmoveTimeout) { return; }
-  const touchmoveLog = new LoggerTouchEvent(TRACKTYPE.TOUCHEVENT, event);
+  const touchmoveLog = new LoggerTouchEvent(TrackType.TOUCHEVENT, event);
   console.log('touchmoveLog: ', touchmoveLog);
 
   iDBStoreInstance.set(OBJECTNAME, touchmoveLog)

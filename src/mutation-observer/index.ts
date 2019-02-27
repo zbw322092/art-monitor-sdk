@@ -1,5 +1,5 @@
 import { LoggerMutation } from '../logger/LoggerMutation';
-import { TRACKTYPE } from '../constants/TRACKTYPE';
+import { TrackType } from '../enums/TrackType';
 import { iDBStoreInstance } from '../data-store/IDBStore';
 import { OBJECTNAME } from '../constants/DB';
 
@@ -7,7 +7,7 @@ const targetNode = document.querySelector('body');
 
 let styleAttrMutationTimeout: number | null;
 const storeMutation = (mutationRecord: MutationRecord) => {
-  const mutaionLog = new LoggerMutation(TRACKTYPE.MUTATION, mutationRecord);
+  const mutaionLog = new LoggerMutation(TrackType.MUTATION, mutationRecord);
   console.log('mutaion log', mutaionLog);
 
   iDBStoreInstance.set(OBJECTNAME, mutaionLog)
