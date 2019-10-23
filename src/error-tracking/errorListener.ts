@@ -4,6 +4,7 @@ import { TrackType } from '../enums/TrackType';
 import { XHR } from '../utils/xhr/index';
 import { BASEURL, REQUESTPATH } from '../constants/API';
 import { HttpMethod } from '../enums/HttpMethod';
+import { LoggerBasicInfo } from '../logger/LoggerBasicInfo';
 
 window.addEventListener('error', (error) => {
   getBehaviorRecords()
@@ -11,7 +12,7 @@ window.addEventListener('error', (error) => {
       console.log('records within error happened 10s: ', records);
 
       const errorTrackInfo = {
-        info: {},
+        info: new LoggerBasicInfo(),
         track: {
           error: new LoggerError(TrackType.ERROR, error),
           behaviors: records
