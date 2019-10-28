@@ -38,10 +38,11 @@
     "curly": false,
     "eofline": false,
     "interface-name": false,
+    "interface-over-type-literal": false,
     "indent": false,
     "ban-types": false,
     "one-variable-per-declaration": false,
-    "only-arrow-functions": false
+    "only-arrow-functions": false,
   },
   "rulesDirectory": []
 }
