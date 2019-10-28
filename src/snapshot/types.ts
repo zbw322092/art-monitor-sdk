@@ -57,3 +57,11 @@ export type serializedNode =
   | commentNode;
 
 export type serializedNodeWithId = serializedNode & { id: number };
+
+export interface INode extends Node {
+  __sn: serializedNodeWithId;
+}
+
+export type idNodeMap = {
+  [key: number]: INode;
+};
