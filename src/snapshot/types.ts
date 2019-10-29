@@ -65,3 +65,7 @@ export interface INode extends Node {
 export type idNodeMap = {
   [key: number]: INode;
 };
+
+export type tagMap = {
+  [key: string]: string;
+};
