@@ -300,7 +300,7 @@ export function serializeNodeWithId(
   (node as INode).__sn = serializedNodeWithId;
   map[id] = node as INode;
 
-  let recordChild;
+  let recordChild = !skipChild;
   if (serializedNodeWithId.type === NodeType.Element) {
     recordChild = !skipChild && !serializedNodeWithId.needBlock;
     delete serializedNodeWithId.needBlock;

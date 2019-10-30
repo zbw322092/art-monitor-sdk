@@ -15,11 +15,11 @@ export default {
       include: ['src/**/*'],
       exclude: 'node_modules/**'
     }),
-    terser({
-      compress: true,
-      mangle: {
-        toplevel: true,
-      }
-    })
+    // terser({
+    //   compress: true,
+    //   mangle: {
+    //     toplevel: true,
+    //   }
+    // })
   ]
 }

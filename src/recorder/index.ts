@@ -72,6 +72,9 @@ function record(options: recordOptions = {}): listenerHandler | undefined {
       maskAllInputs,
     );
 
+    console.log('snapshot node: ', JSON.stringify(node));
+    console.log('idNodeMap: ', idNodeMap);
+
     if (!node) {
       return console.warn('Failed to snapshot the document');
     }
@@ -108,75 +111,75 @@ function record(options: recordOptions = {}): listenerHandler | undefined {
       takeFullSnapshot();
 
       handlers.push(
-        initObservers(
-          {
-            mutationCb: m =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source: IncrementalSource.Mutation,
-                    ...m,
-                  },
-                }),
-              ),
-            mousemoveCb: (positions, source) =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source,
-                    positions,
-                  },
-                }),
-              ),
-            mouseInteractionCb: d =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source: IncrementalSource.MouseInteraction,
-                    ...d,
-                  },
-                }),
-              ),
-            scrollCb: p =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source: IncrementalSource.Scroll,
-                    ...p,
-                  },
-                }),
-              ),
-            viewportResizeCb: d =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source: IncrementalSource.ViewportResize,
-                    ...d,
-                  },
-                }),
-              ),
-            inputCb: v =>
-              wrappedEmit(
-                wrapEvent({
-                  type: EventType.IncrementalSnapshot,
-                  data: {
-                    source: IncrementalSource.Input,
-                    ...v,
-                  },
-                }),
-              ),
-            blockClass,
-            ignoreClass,
-            maskAllInputs,
-            inlineStylesheet,
-          },
-          hooks
-        )
+        // initObservers(
+        //   {
+        //     mutationCb: m =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source: IncrementalSource.Mutation,
+        //             ...m,
+        //           },
+        //         }),
+        //       ),
+        //     mousemoveCb: (positions, source) =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source,
+        //             positions,
+        //           },
+        //         }),
+        //       ),
+        //     mouseInteractionCb: d =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source: IncrementalSource.MouseInteraction,
+        //             ...d,
+        //           },
+        //         }),
+        //       ),
+        //     scrollCb: p =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source: IncrementalSource.Scroll,
+        //             ...p,
+        //           },
+        //         }),
+        //       ),
+        //     viewportResizeCb: d =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source: IncrementalSource.ViewportResize,
+        //             ...d,
+        //           },
+        //         }),
+        //       ),
+        //     inputCb: v =>
+        //       wrappedEmit(
+        //         wrapEvent({
+        //           type: EventType.IncrementalSnapshot,
+        //           data: {
+        //             source: IncrementalSource.Input,
+        //             ...v,
+        //           },
+        //         }),
+        //       ),
+        //     blockClass,
+        //     ignoreClass,
+        //     maskAllInputs,
+        //     inlineStylesheet,
+        //   },
+        //   hooks
+        // )
       );
     };
 
@@ -199,7 +202,7 @@ function record(options: recordOptions = {}): listenerHandler | undefined {
       );
     }
     return () => {
-      handlers.forEach(handler => handler());
+      // handlers.forEach(handler => handler());
     };
   } catch (error) {
     console.warn(error);
