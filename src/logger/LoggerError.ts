@@ -1,7 +1,7 @@
 import { LoggerEvent } from './LoggerEvent';
 
 export class LoggerError extends LoggerEvent {
-  constructor(TrackType: string, errorEvent: ErrorEvent) {
+  constructor(TrackType: number, errorEvent: ErrorEvent) {
     super(TrackType, errorEvent);
 
     this.message = errorEvent.message;

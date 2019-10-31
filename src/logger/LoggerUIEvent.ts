@@ -1,7 +1,7 @@
 import { LoggerEvent } from './LoggerEvent';
 
 export class LoggerUIEvent extends LoggerEvent {
-  constructor(TrackType: string, uiEvent: UIEvent) {
+  constructor(TrackType: number, uiEvent: UIEvent) {
     super(TrackType, uiEvent);
 
     const { detail } = uiEvent;

@@ -2,7 +2,7 @@ import LoggerBase from './LoggerBase';
 import { getEventTargetInfo } from './getEventTargetInfo';
 
 export class LoggerEvent extends LoggerBase {
-  constructor(TrackType: string, event: Event) {
+  constructor(TrackType: number, event: Event) {
     super(TrackType);
 
     this.type = event.type;

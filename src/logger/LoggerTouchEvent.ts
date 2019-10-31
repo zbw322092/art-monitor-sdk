@@ -2,7 +2,7 @@ import { LoggerUIEvent } from './LoggerUIEvent';
 import { getEventTargetInfo } from './getEventTargetInfo';
 
 export class LoggerTouchEvent extends LoggerUIEvent {
-  constructor(TrackType: string , touchEvent: TouchEvent) {
+  constructor(TrackType: number , touchEvent: TouchEvent) {
     super(TrackType, touchEvent);
 
     this.altKey = touchEvent.altKey;

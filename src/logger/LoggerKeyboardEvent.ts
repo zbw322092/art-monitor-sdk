@@ -1,7 +1,7 @@
 import { LoggerUIEvent } from './LoggerUIEvent';
 
 export class LoggerKeyboardEvent extends LoggerUIEvent {
-  constructor(TrackType: string, keyboardEvent: KeyboardEvent) {
+  constructor(TrackType: number, keyboardEvent: KeyboardEvent) {
     super(TrackType, keyboardEvent);
 
     this.altKey = keyboardEvent.altKey;

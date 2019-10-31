@@ -27,7 +27,7 @@ const handleNode = (node: NodeList | Node) => {
 };
 
 export class LoggerMutation extends LoggerBase {
-  constructor(TrackType: string, mutationRecord: MutationRecord) {
+  constructor(TrackType: number, mutationRecord: MutationRecord) {
     super(TrackType);
 
     this.type = mutationRecord.type;

@@ -2,7 +2,7 @@ import { LoggerEvent } from './LoggerEvent';
 import StateChangeEvent from '../utils/lifecycle/StateChangeEvent';
 
 export class LoggerStateChangeEvent extends LoggerEvent {
-  constructor(TrackType: string, stateChangeEvent: StateChangeEvent) {
+  constructor(TrackType: number, stateChangeEvent: StateChangeEvent) {
     super(TrackType, stateChangeEvent as any);
 
     this.newState = stateChangeEvent.newState;

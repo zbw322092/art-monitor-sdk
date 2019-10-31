@@ -1,5 +1,5 @@
-import { blockClass, Mirror, removedNodeMutation, listenerHandler, throttleOptions, event, hookResetter } from './types';
-import { INode } from 'src/snapshot/types';
+import { blockClass, Mirror, removedNodeMutation, listenerHandler, throttleOptions, hookResetter } from './types';
+import { INode } from '../snapshot/types';
 
 export function isBlocked(node: Node | null, blockClass: blockClass): boolean {
   if (!node) { return false; }
