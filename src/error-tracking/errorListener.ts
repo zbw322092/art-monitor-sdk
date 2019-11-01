@@ -1,5 +1,5 @@
 import { getBehaviorRecords } from './getBehaviorRecords';
-import { LoggerError } from '../logger/LoggerError';
+import { LoggerError } from '../logger/LoggerEvent/LoggerError';
 import { TrackType } from '../enums/TrackType';
 import { XHR } from '../utils/xhr/index';
 import { BASEURL, REQUESTPATH } from '../constants/API';

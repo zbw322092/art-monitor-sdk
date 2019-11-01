@@ -1,4 +1,4 @@
-import { LoggerEvent } from './LoggerEvent';
+import { LoggerEvent } from './LoggerEvent/LoggerEvent';
 import StateChangeEvent from '../utils/lifecycle/StateChangeEvent';
 
 export class LoggerStateChangeEvent extends LoggerEvent {

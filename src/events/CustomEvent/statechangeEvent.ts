@@ -1,9 +1,9 @@
-import lifecycle from '../utils/lifecycle/index';
-import { LoggerStateChangeEvent } from '../logger/LoggerStateChangeEvent';
-import { TrackType } from '../enums/TrackType';
-import { iDBStoreInstance } from '../data-store/IDBStore';
-import { OBJECTNAME, DBNAME } from '../constants/DB';
-import { PageState } from '../utils/lifecycle/enums/PageState';
+import lifecycle from '../../utils/lifecycle/index';
+import { LoggerStateChangeEvent } from '../../logger/LoggerStateChangeEvent';
+import { TrackType } from '../../enums/TrackType';
+import { iDBStoreInstance } from '../../data-store/IDBStore';
+import { OBJECTNAME, DBNAME } from '../../constants/DB';
+import { PageState } from '../../utils/lifecycle/enums/PageState';
 
 lifecycle.addEventListener('statechange', (event) => {
   const statechangeLogger = new LoggerStateChangeEvent(TrackType.STATECHANGE, event as any);

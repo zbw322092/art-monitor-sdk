@@ -1,4 +1,4 @@
-import { LoggerEvent } from './LoggerEvent';
+import { LoggerEvent } from '../LoggerEvent/LoggerEvent';
 
 export class LoggerUIEvent extends LoggerEvent {
   constructor(TrackType: number, uiEvent: UIEvent) {

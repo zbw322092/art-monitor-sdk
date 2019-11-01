@@ -1,4 +1,4 @@
-import { LoggerMutation } from '../logger/LoggerMutation';
+import { LoggerMutation } from '../logger/LoggerMutation/LoggerMutation';
 import { TrackType } from '../enums/TrackType';
 import { iDBStoreInstance } from '../data-store/IDBStore';
 import { OBJECTNAME } from '../constants/DB';

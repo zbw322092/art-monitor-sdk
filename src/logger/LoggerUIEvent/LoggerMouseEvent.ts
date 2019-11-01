@@ -1,5 +1,5 @@
 import { LoggerUIEvent } from './LoggerUIEvent';
-import { getEventTargetInfo } from './getEventTargetInfo';
+import { getEventTargetInfo } from '../getEventTargetInfo';
 
 export class LoggerMouseEvent extends LoggerUIEvent {
   constructor(TrackType: number, mouseEvent: MouseEvent) {

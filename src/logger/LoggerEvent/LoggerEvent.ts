@@ -1,5 +1,5 @@
-import LoggerBase from './LoggerBase';
-import { getEventTargetInfo } from './getEventTargetInfo';
+import LoggerBase from '../LoggerBase';
+import { getEventTargetInfo } from '../getEventTargetInfo';
 
 export class LoggerEvent extends LoggerBase {
   constructor(TrackType: number, event: Event) {

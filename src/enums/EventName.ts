@@ -2,10 +2,12 @@
  * list all standard events. Art error monitor will only listen to part of following 
  * events, listing all of them just for completeness.
  */
-
 export enum Event {
   'abort' = 'abort',
   'error' = 'error',
+
+  'load' = 'load',
+  'unload' = 'unload',
 
   'afterprint' = 'afterprint',
 
@@ -96,18 +98,22 @@ export enum Event {
   'submit' = 'submit',
 
   'visibilitychange' = 'visibilitychange',
-}
-
-export enum UIEvent {
-  'abort' = 'abort',
-  'error' = 'error',
-
-  'load' = 'load',
-  'unload' = 'unload',
 
   'resize' = 'resize',
 
   'scroll' = 'scroll',
+}
+
+export enum UIEvent {
+  // 'abort' = 'abort',
+  // 'error' = 'error',
+
+  // 'load' = 'load',
+  // 'unload' = 'unload',
+
+  // 'resize' = 'resize',
+
+  // 'scroll' = 'scroll',
   
   'select' = 'select',
 
@@ -175,7 +181,7 @@ export enum MouseEvent {
   'mouseover' = 'mouseover',
   'mouseup' = 'mouseup',
 
-  'show' = 'show',
+  'show' = 'show', // deprecated
 }
 
 export enum CompositionEvent {

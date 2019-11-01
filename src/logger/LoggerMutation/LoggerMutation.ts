@@ -1,5 +1,5 @@
-import LoggerBase from './LoggerBase';
-import unique from '../utils/unique-selector/index';
+import LoggerBase from '../LoggerBase';
+import unique from '../../utils/unique-selector/index';
 
 const isNodeNotElement = (node: Node | Element) => {
   return node instanceof Node && !(node instanceof Element);
