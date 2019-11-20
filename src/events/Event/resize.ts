@@ -1,4 +1,4 @@
-import { LoggerEvent } from '../../logger/LoggerEvent/LoggerEvent';
+import { LoggerResizeEvent } from '../../logger/LoggerUIEvent/LoggerResizeEvent';
 import { TrackType } from '../../enums/TrackType';
 import { iDBStoreInstance } from '../../data-store/IDBStore';
 import { OBJECTNAME } from '../../constants/DB';
@@ -6,7 +6,7 @@ import { Event } from '../../enums/EventName';
 import { throttle } from '../../utils/throttle';
 
 window.addEventListener(Event.resize, throttle((event) => {
-  const resizeLog = new LoggerEvent(TrackType.EVENT_RESIZE, event);
+  const resizeLog = new LoggerResizeEvent(TrackType.EVENT_RESIZE, event);
   console.log('Log resize: ', resizeLog);
 
   iDBStoreInstance.set(OBJECTNAME, resizeLog)

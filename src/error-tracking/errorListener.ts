@@ -9,7 +9,6 @@ import { LoggerBasicInfo } from '../logger/LoggerBasicInfo';
 window.addEventListener('error', (error) => {
   getBehaviorRecords()
     .then((records) => {
-      console.log('records within error happened 10s: ', records);
 
       const errorTrackInfo = {
         info: new LoggerBasicInfo(),
@@ -18,6 +17,8 @@ window.addEventListener('error', (error) => {
           behaviors: records
         }
       };
+
+      console.log('records within error happened 10s: ', JSON.stringify(errorTrackInfo));
 
       XHR(
         BASEURL + REQUESTPATH,
