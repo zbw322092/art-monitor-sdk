@@ -16,7 +16,9 @@ import { LoggerScrollEvent } from '../logger/LoggerEvent/LoggerScroll';
 
 export type ReplayData = {
   data: {
-    node: serializedNodeWithId | null
+    node: serializedNodeWithId | null,
+    initialScroll: { x: number, y: number },
+    initialWindowSize: { width: number, height: number }
   },
   logs: EventLogger[]
 };

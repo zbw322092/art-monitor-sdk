@@ -16,6 +16,7 @@ const getNodeInfo = (node: Node) => {
 };
 
 const handleNode = (node: NodeList | Node) => {
+  console.log('nodenode: ', node);
   if (node instanceof Node) {
     return getNodeInfo(node);
   }

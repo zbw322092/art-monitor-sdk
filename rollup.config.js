@@ -27,7 +27,8 @@ export default [
   {
     input: './src/replay/replay.ts',
     output: {
-      format: 'esm',
+      format: 'iife',
+      name: 'Replay',
       dir: './dist',
       file: 'art.monitor.replay.js'
     },
