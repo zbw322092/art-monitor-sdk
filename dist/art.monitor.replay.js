@@ -21,6 +21,7 @@ var Replay = (function () {
       TrackType[TrackType["XHRINTERCEPT"] = 15] = "XHRINTERCEPT";
       TrackType[TrackType["ERROR"] = 16] = "ERROR";
   })(TrackType || (TrackType = {}));
+  //# sourceMappingURL=TrackType.js.map
 
   var NodeType;
   (function (NodeType) {
@@ -31,6 +32,7 @@ var Replay = (function () {
       NodeType[NodeType["CDATA"] = 4] = "CDATA";
       NodeType[NodeType["Comment"] = 5] = "Comment";
   })(NodeType || (NodeType = {}));
+  //# sourceMappingURL=types.js.map
 
   /**
    * This file is a fork of https://github.com/reworkcss/css/blob/master/lib/parse/index.js
@@ -584,6 +586,7 @@ var Replay = (function () {
       }
       return obj;
   }
+  //# sourceMappingURL=cssParser.js.map
 
   const tagMap = {
       script: 'noscript',
@@ -763,6 +766,89 @@ var Replay = (function () {
       const idNodeMap = {};
       return [buildNodeWithSerializedNode(node, document, idNodeMap, false, HACK_CSS), idNodeMap];
   }
+  //# sourceMappingURL=rebuild.js.map
+
+  //# sourceMappingURL=LoggerBase.js.map
+
+  // const isNodeNotElement = (node: Node | Element) => {
+  //   return node instanceof Node && !(node instanceof Element);
+  // };
+  // const getNodeInfo = (node: Node) => {
+  //   if (isNodeNotElement(node)) {
+  //     if (node.parentElement) {
+  //       return unique(node.parentElement) + ', nodeValue: ' + node.nodeValue;
+  //     } else { return ''; }
+  //   }
+  //   return unique(node as Element);
+  // };
+  // const handleNode = (node: NodeList | Node) => {
+  //   console.log('nodenode: ', node);
+  //   if (node instanceof Node) {
+  //     return getNodeInfo(node);
+  //   }
+  //   return JSON.stringify(
+  //     Array.prototype.map.call(node, (n: Node | Element) => {
+  //       return getNodeInfo(n);
+  //     })
+  //   );
+  // };
+  // export class LoggerMutation extends LoggerBase {
+  //   constructor(TrackType: number, mutationRecord: MutationRecord) {
+  //     super(TrackType);
+  //     this.type = mutationRecord.type;
+  //     this.target = handleNode(mutationRecord.target);
+  //     this.addedNode = handleNode(mutationRecord.addedNodes);
+  //     this.removedNodes = handleNode(mutationRecord.removedNodes);
+  //     this.attributeName = mutationRecord.attributeName;
+  //     this.attributeNamespace = mutationRecord.attributeNamespace;
+  //     this.previousSibling = mutationRecord.previousSibling ? handleNode(mutationRecord.previousSibling) : null;
+  //     this.nextSibling = mutationRecord.nextSibling ? handleNode(mutationRecord.nextSibling) : null;
+  //     this.oldValue = mutationRecord.oldValue;
+  //   }
+  //   public type: string;
+  //   public target: string;
+  //   public addedNode: string;
+  //   public removedNodes: string;
+  //   public attributeName: string | null;
+  //   public attributeNamespace: string | null;
+  //   public previousSibling: string | null;
+  //   public nextSibling: string | null;
+  //   public oldValue: string | null;
+  // }
+  var MutationType;
+  (function (MutationType) {
+      MutationType["attributes"] = "attributes";
+      MutationType["characterData"] = "characterData";
+      MutationType["childList"] = "childList";
+  })(MutationType || (MutationType = {}));
+  //# sourceMappingURL=LoggerMutation.js.map
+
+  const nodeMirror = {
+      map: {},
+      getId(node) {
+          // if node has not been serialized, return -1
+          if (!node.__sn) {
+              return -1;
+          }
+          return node.__sn.id;
+      },
+      getNode(id) {
+          return nodeMirror.map[id] || null;
+      },
+      removeNodeFromMap(node) {
+          const id = node.__sn && node.__sn.id;
+          delete nodeMirror.map[id];
+          if (node.childNodes) {
+              node.childNodes.forEach((child) => {
+                  nodeMirror.removeNodeFromMap(child);
+              });
+          }
+      },
+      has(id) {
+          return nodeMirror.map.hasOwnProperty(id);
+      }
+  };
+  //# sourceMappingURL=utils.js.map
 
   class Replay {
       constructor(replayData, config) {
@@ -793,14 +879,19 @@ var Replay = (function () {
           this.iframe.setAttribute('scrolling', 'yes');
           this.iframe.setAttribute('style', 'pointer-events: none');
           this.wrapper.appendChild(this.iframe);
+          this.buildInitialPage();
+      }
+      buildInitialPage() {
           const { node, initialScroll, initialWindowSize } = this.replayData.data;
-          rebuild(node, this.iframe.contentDocument);
+          nodeMirror.map = rebuild(node, this.iframe.contentDocument)[1];
           this.iframe.width = `${initialWindowSize.width}px`;
           this.iframe.height = `${initialWindowSize.height}px`;
           this.iframe.contentWindow.scrollTo(initialScroll.x, initialScroll.y);
       }
       play() {
-          this.trackLogHandler(this.replayData.logs);
+          setTimeout(() => {
+              this.trackLogHandler(this.replayData.logs);
+          }, 4000);
       }
       trackLogHandler(logs) {
           logs.forEach((log) => {
@@ -815,10 +906,25 @@ var Replay = (function () {
                       console.log(222);
                       console.log(log.scrollY);
                       this.iframe.contentWindow.scrollTo(log.scrollX, log.scrollY);
+                  case TrackType.MUTATION:
+                      console.log(333);
+                      this.replayMutation(log);
+                      break;
                   default:
                       break;
               }
           });
+      }
+      replayMutation(log) {
+          const { type } = log;
+          switch (type) {
+              case MutationType.characterData:
+                  const targetNode = nodeMirror.getNode(log.target);
+                  targetNode.textContent = log.newValue;
+                  break;
+              default:
+                  break;
+          }
       }
   }
 

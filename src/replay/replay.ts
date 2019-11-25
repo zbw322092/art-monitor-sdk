@@ -3,6 +3,8 @@ import { TrackType } from '../enums/TrackType';
 import rebuild from '../snapshot/rebuild';
 import { LoggerResizeEvent } from '../logger/LoggerUIEvent/LoggerResizeEvent';
 import { LoggerScrollEvent } from 'src/logger/LoggerEvent/LoggerScroll';
+import { LoggerMutation, MutationType } from '../logger/LoggerMutation/LoggerMutation';
+import { nodeMirror } from './utils';
 
 export default class Replay {
   private config: PlayerConfig;
@@ -44,8 +46,12 @@ export default class Replay {
     this.iframe.setAttribute('style', 'pointer-events: none');
     this.wrapper.appendChild(this.iframe);
 
+    this.buildInitialPage();
+  }
+
+  private buildInitialPage() {
     const { node, initialScroll, initialWindowSize } = this.replayData.data;
-    rebuild(node!, this.iframe.contentDocument!);
+    nodeMirror.map = rebuild(node!, this.iframe.contentDocument!)[1];
 
     this.iframe.width = `${initialWindowSize.width}px`;
     this.iframe.height = `${initialWindowSize.height}px`;
@@ -54,7 +60,9 @@ export default class Replay {
   }
 
   public play() {
-    this.trackLogHandler(this.replayData.logs);
+    setTimeout(() => {
+      this.trackLogHandler(this.replayData.logs);
+    }, 4000);
   }
 
   private trackLogHandler(logs: EventLogger[]) {
@@ -72,10 +80,27 @@ export default class Replay {
           this.iframe.contentWindow!.scrollTo(
             (log as LoggerScrollEvent).scrollX,
             (log as LoggerScrollEvent).scrollY
-          )
+          );
+        case TrackType.MUTATION:
+          console.log(333);
+          this.replayMutation(log as LoggerMutation);
+          break;
         default:
           break;
       }
     });
+  }
+
+  private replayMutation(log: LoggerMutation) {
+
+    const { type } = log;
+    switch (type) {
+      case MutationType.characterData:
+        const targetNode = nodeMirror.getNode(log.target as number);
+        targetNode!.textContent = log.newValue;
+        break;
+      default:
+        break;
+    }
   }
 }
