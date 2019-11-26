@@ -1,6 +1,7 @@
 import typescript from 'rollup-plugin-typescript';
 import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
+import postcss from 'rollup-plugin-postcss';
 
 export default [
   {
@@ -16,6 +17,7 @@ export default [
         include: ['src/**/*'],
         exclude: 'node_modules/**'
       }),
+      postcss()
       // terser({
       //   compress: true,
       //   mangle: {
@@ -38,6 +40,7 @@ export default [
         include: ['src/**/*'],
         exclude: 'node_modules/**'
       }),
+      postcss()
       // terser({
       //   compress: true,
       //   mangle: {

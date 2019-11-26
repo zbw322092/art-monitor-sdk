@@ -7,6 +7,8 @@ import { LoggerMutation, MutationType } from '../logger/LoggerMutation/LoggerMut
 import { nodeMirror } from './utils';
 import { serializedNodeWithId } from '../snapshot/types';
 import { Timer } from './timer';
+import { VirtualMouse } from './virtualMouse';
+import { LoggerMouseEvent } from 'src/logger/LoggerUIEvent/LoggerMouseEvent';
 
 export default class Replay {
   private config: PlayerConfig;
@@ -29,19 +31,15 @@ export default class Replay {
     this.config = Object.assign({}, defaultConfig, config);
 
     this.initReplayPanel();
+    this.initVirtualMouse();
   }
 
   private wrapper: HTMLDivElement;
-  private mouse: HTMLDivElement;
   private iframe: HTMLIFrameElement;
   private initReplayPanel() {
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('replayer-wrapper');
     this.config.root.appendChild(this.wrapper);
-
-    this.mouse = document.createElement('div');
-    this.mouse.classList.add('replayer-mouse');
-    this.wrapper.appendChild(this.mouse);
 
     this.iframe = document.createElement('iframe');
     this.iframe.setAttribute('sandbox', 'allow-same-origin');
@@ -50,6 +48,11 @@ export default class Replay {
     this.wrapper.appendChild(this.iframe);
 
     this.buildInitialPage();
+  }
+
+  private virtualMouse: VirtualMouse;
+  private initVirtualMouse() {
+    this.virtualMouse = new VirtualMouse(this.wrapper);
   }
 
   private buildInitialPage() {
@@ -86,7 +89,6 @@ export default class Replay {
           };
           break;
         case TrackType.EVENT_SCROLL:
-          console.log(111);
           action = () => {
             console.log('scroll');
             this.iframe.contentWindow!.scrollTo(
@@ -97,6 +99,16 @@ export default class Replay {
           break;
         case TrackType.MUTATION:
           action = this.replayMutation(log as LoggerMutation);
+          break;
+        case TrackType.MOUSEEVENT_CLICK:
+          action = () => {
+            this.virtualMouse.updatePosition(
+              (log as LoggerMouseEvent).clientX,
+              (log as LoggerMouseEvent).clientY
+            );
+
+            this.virtualMouse.virtualClick();
+          };
           break;
         default:
           break;
@@ -159,6 +171,7 @@ export default class Replay {
 
           removedNodes.forEach((node) => {
             const removedNode = nodeMirror.getNode(node as number);
+            if (!removedNode) { return; }
             nodeMirror.removeNodeFromMap(removedNode!);
             childListTargetNode!.removeChild(removedNode!);
           });

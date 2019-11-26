@@ -22,5 +22,5 @@ export enum TrackType {
   'STATECHANGE',
   'MUTATION',
   'XHRINTERCEPT',
-  'ERROR',
+  'ERROR'
 }

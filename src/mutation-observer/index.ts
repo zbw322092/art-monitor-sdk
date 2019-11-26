@@ -5,7 +5,7 @@ import { OBJECTNAME } from '../constants/DB';
 import { INode } from '../snapshot/types';
 import { isBlocked } from '../recorder/utils';
 import { serializeNodeWithId } from '../snapshot/serializeNodeWithId';
-import { nodeMirror } from 'src/utils/nodeMirror';
+import { nodeMirror } from 'src/state/nodeMirror';
 
 function isSerializedNode(node: Node | INode) {
   return '__sn' in node;

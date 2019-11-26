@@ -891,6 +891,59 @@ var Replay = (function () {
   }
   //# sourceMappingURL=timer.js.map
 
+  function styleInject(css, ref) {
+    if ( ref === void 0 ) ref = {};
+    var insertAt = ref.insertAt;
+
+    if (!css || typeof document === 'undefined') { return; }
+
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+
+    if (insertAt === 'top') {
+      if (head.firstChild) {
+        head.insertBefore(style, head.firstChild);
+      } else {
+        head.appendChild(style);
+      }
+    } else {
+      head.appendChild(style);
+    }
+
+    if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }
+  }
+
+  var css = "body {\n  margin: 0;\n}\n.replayer-wrapper {\n  position: relative;\n}\n.replayer-mouse {\n  position: absolute;\n  width: 20px;\n  height: 20px;\n  transition: 0.05s linear;\n  background-size: contain;\n  background-position: center center;\n  background-repeat: no-repeat;\n  background-image: url('data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9JzMwMHB4JyB3aWR0aD0nMzAwcHgnICBmaWxsPSIjMDAwMDAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGRhdGEtbmFtZT0iTGF5ZXIgMSIgdmlld0JveD0iMCAwIDUwIDUwIiB4PSIwcHgiIHk9IjBweCI+PHRpdGxlPkRlc2lnbl90bnA8L3RpdGxlPjxwYXRoIGQ9Ik00OC43MSw0Mi45MUwzNC4wOCwyOC4yOSw0NC4zMywxOEExLDEsMCwwLDAsNDQsMTYuMzlMMi4zNSwxLjA2QTEsMSwwLDAsMCwxLjA2LDIuMzVMMTYuMzksNDRhMSwxLDAsMCwwLDEuNjUuMzZMMjguMjksMzQuMDgsNDIuOTEsNDguNzFhMSwxLDAsMCwwLDEuNDEsMGw0LjM4LTQuMzhBMSwxLDAsMCwwLDQ4LjcxLDQyLjkxWm0tNS4wOSwzLjY3TDI5LDMyYTEsMSwwLDAsMC0xLjQxLDBsLTkuODUsOS44NUwzLjY5LDMuNjlsMzguMTIsMTRMMzIsMjcuNThBMSwxLDAsMCwwLDMyLDI5TDQ2LjU5LDQzLjYyWiI+PC9wYXRoPjwvc3ZnPg==');\n}\n.replayer-mouse::after {\n  content: '';\n  display: inline-block;\n  width: 20px;\n  height: 20px;\n  border-radius: 10px;\n  background: rgb(73, 80, 246);\n  transform: translate(-10px, -10px);\n  opacity: 0.3;\n}\n.replayer-mouse.active::after {\n  animation: click 0.2s ease-in-out 1;\n}\n\n@keyframes click {\n  0% {\n    opacity: 0.3;\n    width: 20px;\n    height: 20px;\n    border-radius: 10px;\n    transform: translate(-10px, -10px);\n  }\n  50% {\n    opacity: 0.5;\n    width: 10px;\n    height: 10px;\n    border-radius: 5px;\n    transform: translate(-5px, -5px);\n  }\n}\n";
+  styleInject(css);
+
+  class VirtualMouse {
+      constructor(parent) {
+          this.initMouse(parent);
+      }
+      initMouse(parent) {
+          this.mouse = document.createElement('div');
+          this.mouse.classList.add('replayer-mouse');
+          parent.appendChild(this.mouse);
+      }
+      getMouse() {
+          return this.mouse;
+      }
+      updatePosition(x, y) {
+          this.mouse.style.left = `${x}px`;
+          this.mouse.style.top = `${y}px`;
+      }
+      virtualClick() {
+          this.mouse.classList.add('active');
+          this.mouse.classList.remove('active');
+      }
+  }
+  //# sourceMappingURL=virtualMouse.js.map
+
   class Replay {
       constructor(replayData, config) {
           this.replayData = replayData;
@@ -908,20 +961,21 @@ var Replay = (function () {
           };
           this.config = Object.assign({}, defaultConfig, config);
           this.initReplayPanel();
+          this.initVirtualMouse();
       }
       initReplayPanel() {
           this.wrapper = document.createElement('div');
           this.wrapper.classList.add('replayer-wrapper');
           this.config.root.appendChild(this.wrapper);
-          this.mouse = document.createElement('div');
-          this.mouse.classList.add('replayer-mouse');
-          this.wrapper.appendChild(this.mouse);
           this.iframe = document.createElement('iframe');
           this.iframe.setAttribute('sandbox', 'allow-same-origin');
           this.iframe.setAttribute('scrolling', 'yes');
           this.iframe.setAttribute('style', 'pointer-events: none');
           this.wrapper.appendChild(this.iframe);
           this.buildInitialPage();
+      }
+      initVirtualMouse() {
+          this.virtualMouse = new VirtualMouse(this.wrapper);
       }
       buildInitialPage() {
           const { node, initialScroll, initialWindowSize } = this.replayData.data;
@@ -952,7 +1006,6 @@ var Replay = (function () {
                       };
                       break;
                   case TrackType.EVENT_SCROLL:
-                      console.log(111);
                       action = () => {
                           console.log('scroll');
                           this.iframe.contentWindow.scrollTo(log.scrollX, log.scrollY);
@@ -960,6 +1013,12 @@ var Replay = (function () {
                       break;
                   case TrackType.MUTATION:
                       action = this.replayMutation(log);
+                      break;
+                  case TrackType.MOUSEEVENT_CLICK:
+                      action = () => {
+                          this.virtualMouse.updatePosition(log.clientX, log.clientY);
+                          this.virtualMouse.virtualClick();
+                      };
                       break;
                   default:
                       break;
@@ -1016,6 +1075,9 @@ var Replay = (function () {
                       });
                       removedNodes.forEach((node) => {
                           const removedNode = nodeMirror.getNode(node);
+                          if (!removedNode) {
+                              return;
+                          }
                           nodeMirror.removeNodeFromMap(removedNode);
                           childListTargetNode.removeChild(removedNode);
                       });

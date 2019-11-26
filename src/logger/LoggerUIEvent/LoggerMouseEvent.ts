@@ -1,5 +1,7 @@
 import { LoggerUIEvent } from './LoggerUIEvent';
-import { getEventTargetInfo } from '../getEventTargetInfo';
+import { nodeMirror } from 'src/state/nodeMirror';
+import { INode } from 'src/snapshot/types';
+// import { getEventTargetInfo } from '../getEventTargetInfo';
 
 export class LoggerMouseEvent extends LoggerUIEvent {
   constructor(TrackType: number, mouseEvent: MouseEvent) {
@@ -18,7 +20,8 @@ export class LoggerMouseEvent extends LoggerUIEvent {
     this.offsetY = mouseEvent.offsetY;
     this.pageX = mouseEvent.pageX;
     this.pageY = mouseEvent.pageY;
-    this.relatedTarget = getEventTargetInfo(mouseEvent.relatedTarget);
+    // this.relatedTarget = getEventTargetInfo(mouseEvent.relatedTarget);
+    this.relatedTarget = mouseEvent.relatedTarget ? nodeMirror.getId(mouseEvent.relatedTarget as INode) : null;
     this.screenX = mouseEvent.screenX;
     this.screenY = mouseEvent.screenY;
     this.shiftKey = mouseEvent.shiftKey;
@@ -37,7 +40,8 @@ export class LoggerMouseEvent extends LoggerUIEvent {
   public readonly offsetY: number;
   public readonly pageX: number;
   public readonly pageY: number;
-  public readonly relatedTarget: string | null;
+  // public readonly relatedTarget: string | null;
+  public readonly relatedTarget: number | null;
   public readonly screenX: number;
   public readonly screenY: number;
   public readonly shiftKey: boolean;
