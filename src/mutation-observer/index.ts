@@ -109,8 +109,8 @@ export function initMutationObserver(
             newValue: null,
             addedNodes: serializedAddedNodes,
             removedNodes: serializedRemovedNodes,
-            previousSibling: !previousSibling ? previousSibling : nodeMirror.getId(previousSibling as INode),
-            nextSibling: !nextSibling ? nextSibling: nodeMirror.getId(nextSibling as INode)
+            previousSibling: previousSibling === null ? previousSibling : nodeMirror.getId(previousSibling as INode),
+            nextSibling: nextSibling === null ? nextSibling: nodeMirror.getId(nextSibling as INode)
           }
           console.log('mutationData childList: ', mutationData);
           break;

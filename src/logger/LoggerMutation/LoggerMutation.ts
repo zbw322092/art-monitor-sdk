@@ -1,5 +1,4 @@
 import LoggerBase from '../LoggerBase';
-import unique from '../../utils/unique-selector/index';
 import { serializedNodeWithId } from '../../snapshot/types';
 
 // const isNodeNotElement = (node: Node | Element) => {
@@ -76,9 +75,9 @@ export class LoggerMutation extends LoggerBase {
   constructor(TrackType: number, mutationData: MutationData) {
     super(TrackType);
 
-    this.type = mutationData.type;
+    this.mutationType = mutationData.type;
     this.target = mutationData.target;
-    this.addedNode = mutationData.addedNodes;
+    this.addedNodes = mutationData.addedNodes;
     this.removedNodes = mutationData.removedNodes;
     this.attributeName = mutationData.attributeName;
     // this.attributeNamespace = mutationData;
@@ -88,9 +87,9 @@ export class LoggerMutation extends LoggerBase {
     this.newValue = mutationData.newValue;
   }
 
-  public type: string;
+  public mutationType: string;
   public target: number | serializedNodeWithId | null;
-  public addedNode: Array<number | serializedNodeWithId | null>;
+  public addedNodes: Array<number | serializedNodeWithId | null>;
   public removedNodes: Array<number | serializedNodeWithId | null>;
   public attributeName: string | null;
   // public attributeNamespace: string | null;

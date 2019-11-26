@@ -850,11 +850,53 @@ var Replay = (function () {
   };
   //# sourceMappingURL=utils.js.map
 
+  class Timer {
+      constructor(playerConfig, actions) {
+          this.playerConfig = playerConfig;
+          this.actions = actions;
+      }
+      start() {
+          this.actions.sort((prevAction, nextAction) => {
+              return prevAction.delay - nextAction.delay;
+          });
+          let timeElapsed = 0;
+          let lastTimestamp = performance.now();
+          const { actions, playerConfig } = this;
+          const self = this;
+          function check(time) {
+              timeElapsed = timeElapsed + (time - lastTimestamp) * playerConfig.speed;
+              lastTimestamp = time;
+              while (actions.length) {
+                  const currentAction = actions[0];
+                  if (timeElapsed >= currentAction.delay) {
+                      actions.shift();
+                      currentAction.action();
+                  }
+                  else {
+                      break;
+                  }
+              }
+              if (actions.length > 0 || playerConfig.liveMode) {
+                  self.raf = requestAnimationFrame(check);
+              }
+          }
+          this.raf = requestAnimationFrame(check);
+      }
+      clear() {
+          if (this.raf) {
+              cancelAnimationFrame(this.raf);
+          }
+          this.actions.length = 0;
+      }
+  }
+  //# sourceMappingURL=timer.js.map
+
   class Replay {
       constructor(replayData, config) {
           this.replayData = replayData;
           const defaultConfig = {
               speed: 1,
+              initialDelay: 1000,
               root: document.body,
               loadTimeout: 0,
               skipInactive: false,
@@ -889,42 +931,99 @@ var Replay = (function () {
           this.iframe.contentWindow.scrollTo(initialScroll.x, initialScroll.y);
       }
       play() {
-          setTimeout(() => {
-              this.trackLogHandler(this.replayData.logs);
-          }, 4000);
+          const actions = this.trackLogHandler(this.replayData.logs);
+          const timer = new Timer(this.config, actions);
+          timer.start();
+      }
+      getDelay(log) {
+          const firstLogTimestamp = this.replayData.logs[0] && this.replayData.logs[0].timestamp;
+          return log.timestamp - firstLogTimestamp + this.config.initialDelay;
       }
       trackLogHandler(logs) {
+          const actions = [];
           logs.forEach((log) => {
+              let action = () => { };
               switch (log.TrackType) {
                   case TrackType.EVENT_RESIZE:
-                      console.log(111);
-                      console.log(`${log.width}px, `, `${log.height}px`);
-                      this.iframe.width = `${log.width}px`;
-                      this.iframe.height = `${log.height}px`;
+                      action = () => {
+                          console.log(`${log.width}px, `, `${log.height}px`);
+                          this.iframe.width = `${log.width}px`;
+                          this.iframe.height = `${log.height}px`;
+                      };
                       break;
                   case TrackType.EVENT_SCROLL:
-                      console.log(222);
-                      console.log(log.scrollY);
-                      this.iframe.contentWindow.scrollTo(log.scrollX, log.scrollY);
+                      console.log(111);
+                      action = () => {
+                          console.log('scroll');
+                          this.iframe.contentWindow.scrollTo(log.scrollX, log.scrollY);
+                      };
+                      break;
                   case TrackType.MUTATION:
-                      console.log(333);
-                      this.replayMutation(log);
+                      action = this.replayMutation(log);
                       break;
                   default:
                       break;
               }
+              actions.push({
+                  action,
+                  delay: this.getDelay(log)
+              });
           });
+          return actions;
       }
       replayMutation(log) {
-          const { type } = log;
-          switch (type) {
+          const { mutationType, addedNodes, removedNodes, nextSibling, newValue, attributeName } = log;
+          let action = () => { };
+          switch (mutationType) {
               case MutationType.characterData:
-                  const targetNode = nodeMirror.getNode(log.target);
-                  targetNode.textContent = log.newValue;
+                  action = () => {
+                      console.log('characterData');
+                      const characterTargetNode = nodeMirror.getNode(log.target);
+                      characterTargetNode.textContent = log.newValue;
+                  };
                   break;
+              case MutationType.attributes:
+                  action = () => {
+                      console.log('attributes');
+                      const attributesTargetNode = nodeMirror.getNode(log.target);
+                      // TODO handle null target situation
+                      if (!attributesTargetNode) {
+                          return;
+                      }
+                      if (newValue === null) {
+                          attributesTargetNode.removeAttribute(attributeName);
+                      }
+                      else {
+                          attributesTargetNode.setAttribute(attributeName, newValue);
+                      }
+                  };
+                  break;
+              case MutationType.childList:
+                  action = () => {
+                      console.log('childList');
+                      const childListTargetNode = nodeMirror.getNode(log.target);
+                      const nextSiblingNode = nextSibling === null ? null : nodeMirror.getNode(nextSibling);
+                      const builtAddedNodes = addedNodes.map((node) => {
+                          return buildNodeWithSerializedNode(node, this.iframe.contentDocument, nodeMirror.map);
+                      });
+                      builtAddedNodes.forEach((node) => {
+                          if (nextSiblingNode) {
+                              childListTargetNode.insertBefore(node, nextSiblingNode);
+                          }
+                          else {
+                              childListTargetNode.appendChild(node);
+                          }
+                      });
+                      removedNodes.forEach((node) => {
+                          const removedNode = nodeMirror.getNode(node);
+                          nodeMirror.removeNodeFromMap(removedNode);
+                          childListTargetNode.removeChild(removedNode);
+                      });
+                  };
               default:
                   break;
           }
+          return action;
       }
   }
 

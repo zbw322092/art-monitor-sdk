@@ -1,10 +1,12 @@
-import { EventLogger, PlayerConfig, ReplayData } from './types';
+import { EventLogger, PlayerConfig, ReplayData, Actions } from './types';
 import { TrackType } from '../enums/TrackType';
-import rebuild from '../snapshot/rebuild';
+import rebuild, { buildNodeWithSerializedNode } from '../snapshot/rebuild';
 import { LoggerResizeEvent } from '../logger/LoggerUIEvent/LoggerResizeEvent';
 import { LoggerScrollEvent } from 'src/logger/LoggerEvent/LoggerScroll';
 import { LoggerMutation, MutationType } from '../logger/LoggerMutation/LoggerMutation';
 import { nodeMirror } from './utils';
+import { serializedNodeWithId } from '../snapshot/types';
+import { Timer } from './timer';
 
 export default class Replay {
   private config: PlayerConfig;
@@ -14,6 +16,7 @@ export default class Replay {
 
     const defaultConfig: PlayerConfig = {
       speed: 1,
+      initialDelay: 1000,
       root: document.body,
       loadTimeout: 0,
       skipInactive: false,
@@ -60,47 +63,110 @@ export default class Replay {
   }
 
   public play() {
-    setTimeout(() => {
-      this.trackLogHandler(this.replayData.logs);
-    }, 4000);
+    const actions = this.trackLogHandler(this.replayData.logs);
+    const timer = new Timer(this.config, actions);
+    timer.start();
   }
 
-  private trackLogHandler(logs: EventLogger[]) {
+  private getDelay(log: EventLogger) {
+    const firstLogTimestamp = this.replayData.logs[0] && this.replayData.logs[0].timestamp;
+    return log.timestamp - firstLogTimestamp + this.config.initialDelay;
+  }
+
+  private trackLogHandler(logs: EventLogger[]): Actions[] {
+    const actions: Actions[] = [];
     logs.forEach((log) => {
+      let action: () => any = () => { };
       switch (log.TrackType) {
         case TrackType.EVENT_RESIZE:
-          console.log(111);
-          console.log(`${(log as LoggerResizeEvent).width}px, `, `${(log as LoggerResizeEvent).height}px`);
-          this.iframe.width = `${(log as LoggerResizeEvent).width}px`;
-          this.iframe.height = `${(log as LoggerResizeEvent).height}px`;
+          action = () => {
+            console.log(`${(log as LoggerResizeEvent).width}px, `, `${(log as LoggerResizeEvent).height}px`);
+            this.iframe.width = `${(log as LoggerResizeEvent).width}px`;
+            this.iframe.height = `${(log as LoggerResizeEvent).height}px`;
+          };
           break;
         case TrackType.EVENT_SCROLL:
-          console.log(222);
-          console.log((log as LoggerScrollEvent).scrollY);
-          this.iframe.contentWindow!.scrollTo(
-            (log as LoggerScrollEvent).scrollX,
-            (log as LoggerScrollEvent).scrollY
-          );
+          console.log(111);
+          action = () => {
+            console.log('scroll');
+            this.iframe.contentWindow!.scrollTo(
+              (log as LoggerScrollEvent).scrollX,
+              (log as LoggerScrollEvent).scrollY
+            );
+          }
+          break;
         case TrackType.MUTATION:
-          console.log(333);
-          this.replayMutation(log as LoggerMutation);
+          action = this.replayMutation(log as LoggerMutation);
           break;
         default:
           break;
       }
+      actions.push({
+        action,
+        delay: this.getDelay(log)
+      });
     });
+    return actions;
   }
 
   private replayMutation(log: LoggerMutation) {
 
-    const { type } = log;
-    switch (type) {
+    const { mutationType, addedNodes, removedNodes, nextSibling, newValue, attributeName } = log;
+    let action: () => any = () => { };
+    switch (mutationType) {
       case MutationType.characterData:
-        const targetNode = nodeMirror.getNode(log.target as number);
-        targetNode!.textContent = log.newValue;
+        action = () => {
+          console.log('characterData');
+          const characterTargetNode = nodeMirror.getNode(log.target as number);
+          characterTargetNode!.textContent = log.newValue;
+        }
         break;
+      case MutationType.attributes:
+        action = () => {
+          console.log('attributes');
+          const attributesTargetNode = nodeMirror.getNode(log.target as number);
+          // TODO handle null target situation
+          if (!attributesTargetNode) { return; }
+          if (newValue === null) {
+            (attributesTargetNode as Node as Element).removeAttribute(attributeName as string);
+          } else {
+            (attributesTargetNode as Node as Element).setAttribute(
+              attributeName as string,
+              newValue
+            );
+          }
+        }
+        break;
+      case MutationType.childList:
+        action = () => {
+          console.log('childList');
+          const childListTargetNode = nodeMirror.getNode(log.target as number);
+          const nextSiblingNode = nextSibling === null ? null : nodeMirror.getNode(nextSibling as number)
+          const builtAddedNodes = addedNodes.map((node) => {
+            return buildNodeWithSerializedNode(
+              node as serializedNodeWithId,
+              this.iframe.contentDocument!,
+              nodeMirror.map
+            );
+          });
+          builtAddedNodes.forEach((node) => {
+            if (nextSiblingNode) {
+              childListTargetNode!.insertBefore(node!, nextSiblingNode);
+            } else {
+              childListTargetNode!.appendChild(node!);
+            }
+          });
+
+          removedNodes.forEach((node) => {
+            const removedNode = nodeMirror.getNode(node as number);
+            nodeMirror.removeNodeFromMap(removedNode!);
+            childListTargetNode!.removeChild(removedNode!);
+          });
+        }
       default:
         break;
     }
+
+    return action;
   }
 }

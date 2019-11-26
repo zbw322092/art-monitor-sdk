@@ -30,6 +30,7 @@ export type EventLogger = LoggerError | LoggerEvent | LoggerNetwork | LoggerMuta
 
 export type PlayerConfig = {
   speed: number;
+  initialDelay: number;
   root: Element;
   loadTimeout: number;
   skipInactive: boolean;
@@ -39,3 +40,8 @@ export type PlayerConfig = {
   liveMode: boolean;
   insertStyleRules: string[];
 };
+
+export type Actions = {
+  action: () => void;
+  delay: number;
+}
