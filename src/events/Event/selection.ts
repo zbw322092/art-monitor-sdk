@@ -23,7 +23,7 @@ export function initSelectionListener() {
     }
   });
 
-  document.addEventListener(Event.selectionchange, (event) => {
+  document.addEventListener(Event.selectionchange, throttle((event) => {
     const selection = document.getSelection();
     if (selection) {
       const direction = detectSelectionDirection(selection);
@@ -37,5 +37,5 @@ export function initSelectionListener() {
           console.log('scroll log err: ', err);
         });
     }
-  });
+  }, 200));
 }

@@ -953,6 +953,7 @@ var Replay = (function () {
       SelectionDirection[SelectionDirection["collapsed"] = 2] = "collapsed";
       SelectionDirection[SelectionDirection["null"] = 3] = "null";
   })(SelectionDirection || (SelectionDirection = {}));
+  //# sourceMappingURL=SelectionDirection.js.map
 
   class Replay {
       constructor(replayData, config) {
@@ -1113,23 +1114,28 @@ var Replay = (function () {
           return () => {
               console.log('range');
               const { anchorOffset, focusOffset, direction } = log;
-              console.log('anchorOffset: ', anchorOffset);
-              console.log('focusOffset: ', focusOffset);
               const range = new Range();
+              const cursorPosition = { x: 0, y: 0 };
               if (direction === SelectionDirection.forward) {
                   range.setStart(ancherNode, anchorOffset);
                   range.setEnd(focusNode, focusOffset);
+                  const clientRects = range.getClientRects();
+                  const lastRect = clientRects[clientRects.length - 1];
+                  cursorPosition.x = lastRect.left + lastRect.width;
+                  cursorPosition.y = lastRect.top;
               }
               else if (direction === SelectionDirection.backward) {
                   range.setStart(focusNode, focusOffset);
                   range.setEnd(ancherNode, anchorOffset);
+                  const firstRect = range.getClientRects()[0];
+                  cursorPosition.x = firstRect.x;
+                  cursorPosition.y = firstRect.y;
               }
               else if (direction === SelectionDirection.collapsed) {
                   return;
               }
-              // document.getSelection()!.removeAllRanges();
-              console.log('range text: ', range.toString());
               this.iframe.contentDocument.getSelection().removeAllRanges();
+              this.virtualMouse.updatePosition(cursorPosition.x, cursorPosition.y);
               this.iframe.contentDocument.getSelection().addRange(range);
           };
       }
