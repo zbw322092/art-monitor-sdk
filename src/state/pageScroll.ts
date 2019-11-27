@@ -16,6 +16,8 @@ class PageScroll {
     )[0];
   }
 
+  // TODO clear obsolete scroll records
+
   public clearRecords() {
     this.scrollRecords.length = 0;
   }

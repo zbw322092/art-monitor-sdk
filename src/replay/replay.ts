@@ -9,6 +9,8 @@ import { serializedNodeWithId } from '../snapshot/types';
 import { Timer } from './timer';
 import { VirtualMouse } from './virtualMouse';
 import { LoggerMouseEvent } from 'src/logger/LoggerUIEvent/LoggerMouseEvent';
+import { LoggerSelection } from 'src/logger/LoggerEvent/LoggerSelection';
+import { SelectionDirection } from 'src/enums/SelectionDirection';
 
 export default class Replay {
   private config: PlayerConfig;
@@ -44,7 +46,7 @@ export default class Replay {
     this.iframe = document.createElement('iframe');
     this.iframe.setAttribute('sandbox', 'allow-same-origin');
     this.iframe.setAttribute('scrolling', 'yes');
-    this.iframe.setAttribute('style', 'pointer-events: none');
+    this.iframe.setAttribute('style', 'pointer-events: none;');
     this.wrapper.appendChild(this.iframe);
 
     this.buildInitialPage();
@@ -109,6 +111,10 @@ export default class Replay {
 
             this.virtualMouse.virtualClick();
           };
+          break;
+        case TrackType.EVENT_SELECTIONSTART:
+        case TrackType.EVENT_SELECTIONCHANGE:
+          action = this.replaySelection(log as LoggerSelection);
           break;
         default:
           break;
@@ -176,10 +182,39 @@ export default class Replay {
             childListTargetNode!.removeChild(removedNode!);
           });
         }
+        break;
       default:
         break;
     }
 
     return action;
+  }
+
+  private replaySelection(log: LoggerSelection): () => any {
+    const ancherNode = log.anchorNode === null ? null : nodeMirror.getNode(log.anchorNode);
+    const focusNode = log.focusNode === null ? null : nodeMirror.getNode(log.focusNode);
+    if (!ancherNode || !focusNode ||
+      !this.iframe.contentDocument ||
+      !this.iframe.contentDocument.getSelection) { return () => {}; }
+    return () => {
+      console.log('range');
+      const { anchorOffset, focusOffset, direction } = log;
+      console.log('anchorOffset: ', anchorOffset);
+      console.log('focusOffset: ', focusOffset);
+      const range = new Range();
+      if (direction === SelectionDirection.forward) {
+        range.setStart(ancherNode, anchorOffset);
+        range.setEnd(focusNode, focusOffset);
+      } else if (direction === SelectionDirection.backward) {
+        range.setStart(focusNode, focusOffset);
+        range.setEnd(ancherNode, anchorOffset);
+      } else if (direction === SelectionDirection.collapsed) {
+        return;
+      }
+      // document.getSelection()!.removeAllRanges();
+      console.log('range text: ', range.toString());
+      this.iframe.contentDocument!.getSelection()!.removeAllRanges();
+      this.iframe.contentDocument!.getSelection()!.addRange(range);
+    };
   }
 }

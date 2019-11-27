@@ -11,8 +11,8 @@ export class LoggerEvent extends LoggerBase {
     this.eventPhase = event.eventPhase;
     // this.currentTarget = getEventTargetInfo(event.currentTarget);
     // this.target = getEventTargetInfo(event.target);
-    console.log('event.currentTarget: ', event.currentTarget);
-    console.log('event.target: ', event.target);
+    // console.log('event.currentTarget: ', event.currentTarget);
+    // console.log('event.target: ', event.target);
     this.currentTarget = event.currentTarget ? nodeMirror.getId(event.currentTarget as INode) : null;
     this.target = event.target ? nodeMirror.getId(event.target as INode) : null;
   }

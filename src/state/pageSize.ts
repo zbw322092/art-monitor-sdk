@@ -16,6 +16,8 @@ class PageSize {
     )[0];
   }
 
+  // TODO clear obsolete scroll records
+
   public clearRecords() {
     this.sizeRecords.length = 0;
   }

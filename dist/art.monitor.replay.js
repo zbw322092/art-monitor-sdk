@@ -20,6 +20,8 @@ var Replay = (function () {
       TrackType[TrackType["MUTATION"] = 14] = "MUTATION";
       TrackType[TrackType["XHRINTERCEPT"] = 15] = "XHRINTERCEPT";
       TrackType[TrackType["ERROR"] = 16] = "ERROR";
+      TrackType[TrackType["EVENT_SELECTIONSTART"] = 17] = "EVENT_SELECTIONSTART";
+      TrackType[TrackType["EVENT_SELECTIONCHANGE"] = 18] = "EVENT_SELECTIONCHANGE";
   })(TrackType || (TrackType = {}));
   //# sourceMappingURL=TrackType.js.map
 
@@ -938,11 +940,19 @@ var Replay = (function () {
           this.mouse.style.top = `${y}px`;
       }
       virtualClick() {
-          this.mouse.classList.add('active');
           this.mouse.classList.remove('active');
+          this.mouse.classList.add('active');
       }
   }
   //# sourceMappingURL=virtualMouse.js.map
+
+  var SelectionDirection;
+  (function (SelectionDirection) {
+      SelectionDirection[SelectionDirection["forward"] = 0] = "forward";
+      SelectionDirection[SelectionDirection["backward"] = 1] = "backward";
+      SelectionDirection[SelectionDirection["collapsed"] = 2] = "collapsed";
+      SelectionDirection[SelectionDirection["null"] = 3] = "null";
+  })(SelectionDirection || (SelectionDirection = {}));
 
   class Replay {
       constructor(replayData, config) {
@@ -970,7 +980,7 @@ var Replay = (function () {
           this.iframe = document.createElement('iframe');
           this.iframe.setAttribute('sandbox', 'allow-same-origin');
           this.iframe.setAttribute('scrolling', 'yes');
-          this.iframe.setAttribute('style', 'pointer-events: none');
+          this.iframe.setAttribute('style', 'pointer-events: none;');
           this.wrapper.appendChild(this.iframe);
           this.buildInitialPage();
       }
@@ -1019,6 +1029,10 @@ var Replay = (function () {
                           this.virtualMouse.updatePosition(log.clientX, log.clientY);
                           this.virtualMouse.virtualClick();
                       };
+                      break;
+                  case TrackType.EVENT_SELECTIONSTART:
+                  case TrackType.EVENT_SELECTIONCHANGE:
+                      action = this.replaySelection(log);
                       break;
                   default:
                       break;
@@ -1082,10 +1096,42 @@ var Replay = (function () {
                           childListTargetNode.removeChild(removedNode);
                       });
                   };
+                  break;
               default:
                   break;
           }
           return action;
+      }
+      replaySelection(log) {
+          const ancherNode = log.anchorNode === null ? null : nodeMirror.getNode(log.anchorNode);
+          const focusNode = log.focusNode === null ? null : nodeMirror.getNode(log.focusNode);
+          if (!ancherNode || !focusNode ||
+              !this.iframe.contentDocument ||
+              !this.iframe.contentDocument.getSelection) {
+              return () => { };
+          }
+          return () => {
+              console.log('range');
+              const { anchorOffset, focusOffset, direction } = log;
+              console.log('anchorOffset: ', anchorOffset);
+              console.log('focusOffset: ', focusOffset);
+              const range = new Range();
+              if (direction === SelectionDirection.forward) {
+                  range.setStart(ancherNode, anchorOffset);
+                  range.setEnd(focusNode, focusOffset);
+              }
+              else if (direction === SelectionDirection.backward) {
+                  range.setStart(focusNode, focusOffset);
+                  range.setEnd(ancherNode, anchorOffset);
+              }
+              else if (direction === SelectionDirection.collapsed) {
+                  return;
+              }
+              // document.getSelection()!.removeAllRanges();
+              console.log('range text: ', range.toString());
+              this.iframe.contentDocument.getSelection().removeAllRanges();
+              this.iframe.contentDocument.getSelection().addRange(range);
+          };
       }
   }
 

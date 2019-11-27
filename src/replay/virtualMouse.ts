@@ -22,7 +22,7 @@ export class VirtualMouse {
   }
 
   public virtualClick() {
-    this.mouse.classList.add('active');
     this.mouse.classList.remove('active');
+    this.mouse.classList.add('active');
   }
 }
