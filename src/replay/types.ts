@@ -14,6 +14,7 @@ import { serializedNodeWithId } from '../snapshot/types';
 import { LoggerResizeEvent } from '../logger/LoggerUIEvent/LoggerResizeEvent';
 import { LoggerScrollEvent } from '../logger/LoggerEvent/LoggerScroll';
 import { LoggerSelection } from '../logger/LoggerEvent/LoggerSelection';
+import { LoggerInputEvent } from '../logger/LoggerUIEvent/LoggerInputEvent';
 
 export type ReplayData = {
   data: {
@@ -27,7 +28,7 @@ export type ReplayData = {
 export type EventLogger = LoggerError | LoggerEvent | LoggerNetwork | LoggerMutation |
   LoggerFocusEvent | LoggerKeyboardEvent | LoggerMouseEvent | LoggerPointerEvent |
   LoggerTouchEvent | LoggerUIEvent | LoggerResizeEvent | LoggerScrollEvent | LoggerStateChangeEvent |
-  LoggerXHR | LoggerSelection;
+  LoggerXHR | LoggerSelection | LoggerInputEvent;
 
 export type PlayerConfig = {
   speed: number;

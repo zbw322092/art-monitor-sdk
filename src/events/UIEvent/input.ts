@@ -6,12 +6,8 @@ import { LoggerInputEvent } from '../../logger/LoggerUIEvent/LoggerInputEvent';
 
 export function initInputListener() {
   window.addEventListener(Event.input, (event) => {
+    // TODO range input type generate too many logs, optimize it
     const inputEvent = new LoggerInputEvent(TrackType.INPUTEVENT_INPUT, event as InputEvent);
-    const { target } = event;
-    if (target) {
-      console.log('target.value: ', (target as HTMLInputElement).value);
-    }
-    console.log('log input: ', inputEvent);
   
     iDBStoreInstance.set(OBJECTNAME, inputEvent)
       .then(() => {

@@ -11,6 +11,10 @@ import { VirtualMouse } from './virtualMouse';
 import { LoggerMouseEvent } from 'src/logger/LoggerUIEvent/LoggerMouseEvent';
 import { LoggerSelection } from 'src/logger/LoggerEvent/LoggerSelection';
 import { SelectionDirection } from 'src/enums/SelectionDirection';
+import { LoggerInputEvent } from 'src/logger/LoggerUIEvent/LoggerInputEvent';
+
+export type InputableElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+const MASKMARK = '*';
 
 export default class Replay {
   private config: PlayerConfig;
@@ -115,6 +119,9 @@ export default class Replay {
         case TrackType.EVENT_SELECTIONSTART:
         case TrackType.EVENT_SELECTIONCHANGE:
           action = this.replaySelection(log as LoggerSelection);
+          break;
+        case TrackType.INPUTEVENT_INPUT:
+          action = this.replayInput(log as LoggerInputEvent);
           break;
         default:
           break;
@@ -223,5 +230,45 @@ export default class Replay {
       this.virtualMouse.updatePosition(cursorPosition.x, cursorPosition.y);
       this.iframe.contentDocument!.getSelection()!.addRange(range);
     };
+  }
+
+  private checkInputElementType(element: Node, type: string | string[]): boolean {
+    return Object.prototype.toString.call(element) === '[object HTMLInputElement]' &&
+    (
+      typeof type === 'string' ?
+      ((element as Node) as HTMLInputElement).type === type :
+      type.includes(((element as Node) as HTMLInputElement).type)
+    );
+  }
+
+  private replayInput(log: LoggerInputEvent): () => any {
+    const { target, isMasked, inputTargetValue, inputTargetValueLength } = log;
+    if (target === null) { return () => {}; }
+    const inputTarget = nodeMirror.getNode(target);
+    if (inputTarget === null) { return () => {}; }
+    if (isMasked) {
+      return () => {
+        ((inputTarget as Node) as InputableElement).value = MASKMARK.repeat(inputTargetValueLength as number);
+      };
+    } else {
+      const partialInputElementTypes = ['color', 'date', 'datetime-local', 'email', 'image', 'month', 'number', 'password',
+      'range', 'search', 'tel', 'text', 'time', 'url', 'week'];
+      return () => {
+        if (this.checkInputElementType(inputTarget, 'radio')) {
+          ((inputTarget as Node) as HTMLInputElement).checked = true;
+        } else if (this.checkInputElementType(inputTarget, 'checkbox')) {
+          ((inputTarget as Node) as HTMLInputElement).checked = !((inputTarget as Node) as HTMLInputElement).checked;
+        } else if (
+          this.checkInputElementType(inputTarget, partialInputElementTypes) ||
+          Object.prototype.toString.call(inputTarget) === '[object HTMLSelectElement]' ||
+          Object.prototype.toString.call(inputTarget) === '[object HTMLTextAreaElement]'
+        ) {
+          ((inputTarget as Node) as HTMLInputElement).value = inputTargetValue || '';
+        } else if (this.checkInputElementType(inputTarget, 'file')) {
+          // TODO hanle file input type
+          console.log('add file: ', inputTargetValue);
+        }
+      };
+    }
   }
 }
