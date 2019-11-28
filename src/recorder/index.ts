@@ -7,6 +7,7 @@ import { initMouseListener } from 'src/events/MouseEvent/mouseEvent';
 import { pageSize } from '../state/pageSize';
 import { pageScroll } from '../state/pageScroll';
 import { initSelectionListener } from '../events/Event/selection';
+import { initInputListener } from '../events/UIEvent/input';
 
 window.addEventListener('DOMContentLoaded', () => {
   const [node, idNodeMap] = snapshot(document);
@@ -28,6 +29,7 @@ window.addEventListener('DOMContentLoaded', () => {
   initScrollListener();
   initMouseListener();
   initSelectionListener();
+  initInputListener();
 
 
   

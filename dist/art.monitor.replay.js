@@ -22,8 +22,8 @@ var Replay = (function () {
       TrackType[TrackType["ERROR"] = 16] = "ERROR";
       TrackType[TrackType["EVENT_SELECTIONSTART"] = 17] = "EVENT_SELECTIONSTART";
       TrackType[TrackType["EVENT_SELECTIONCHANGE"] = 18] = "EVENT_SELECTIONCHANGE";
+      TrackType[TrackType["INPUTEVENT_INPUT"] = 19] = "INPUTEVENT_INPUT";
   })(TrackType || (TrackType = {}));
-  //# sourceMappingURL=TrackType.js.map
 
   var NodeType;
   (function (NodeType) {
@@ -1140,6 +1140,7 @@ var Replay = (function () {
           };
       }
   }
+  //# sourceMappingURL=replay.js.map
 
   return Replay;
 
