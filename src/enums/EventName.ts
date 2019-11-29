@@ -335,6 +335,9 @@ export enum WheelEvent {
   'wheel' = 'wheel'
 }
 
+export enum CustomEvent {
+  'statechange' = 'statechange'
+}
 
 // deprecated
 // export enum AudioProcessingEvent {}

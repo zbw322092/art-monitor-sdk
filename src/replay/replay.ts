@@ -12,6 +12,7 @@ import { LoggerMouseEvent } from 'src/logger/LoggerUIEvent/LoggerMouseEvent';
 import { LoggerSelection } from 'src/logger/LoggerEvent/LoggerSelection';
 import { SelectionDirection } from 'src/enums/SelectionDirection';
 import { LoggerInputEvent } from 'src/logger/LoggerUIEvent/LoggerInputEvent';
+import { LoggerStateChangeEvent } from 'src/logger/LoggerStateChangeEvent';
 
 export type InputableElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 const MASKMARK = '*';
@@ -36,10 +37,12 @@ export default class Replay {
     };
     this.config = Object.assign({}, defaultConfig, config);
 
+    this.pageStateElement = document.querySelector('.page-state');
     this.initReplayPanel();
     this.initVirtualMouse();
   }
 
+  private pageStateElement: HTMLDivElement | null;
   private wrapper: HTMLDivElement;
   private iframe: HTMLIFrameElement;
   private initReplayPanel() {
@@ -122,6 +125,9 @@ export default class Replay {
           break;
         case TrackType.INPUTEVENT_INPUT:
           action = this.replayInput(log as LoggerInputEvent);
+          break;
+        case TrackType.STATECHANGE:
+          action = this.replayPageStateChange(log as LoggerStateChangeEvent);
           break;
         default:
           break;
@@ -265,10 +271,27 @@ export default class Replay {
         ) {
           ((inputTarget as Node) as HTMLInputElement).value = inputTargetValue || '';
         } else if (this.checkInputElementType(inputTarget, 'file')) {
-          // TODO hanle file input type
+          // TODO handle file input type properly
           console.log('add file: ', inputTargetValue);
         }
       };
+    }
+  }
+
+  private replayPageStateChange(log: LoggerStateChangeEvent): () => any {
+    const { prevState, newState } = log;
+    console.log('this.pageStateElement: ', this.pageStateElement);
+    if (this.pageStateElement === null) { return () => {}; }
+
+    const currentStateElement = this.pageStateElement.querySelector(`.${newState}`);
+    if (currentStateElement === null) { return () => {}; }
+    const previousStateElement = this.pageStateElement.querySelector(`.${prevState}`);
+    return () => {
+      console.log('replayPageStateChange');
+      currentStateElement.classList.add('current-active');
+      if (previousStateElement) {
+        previousStateElement.classList.remove('current-active');
+      }
     }
   }
 }

@@ -973,6 +973,7 @@ var Replay = (function () {
               insertStyleRules: []
           };
           this.config = Object.assign({}, defaultConfig, config);
+          this.pageStateElement = document.querySelector('.page-state');
           this.initReplayPanel();
           this.initVirtualMouse();
       }
@@ -1039,6 +1040,9 @@ var Replay = (function () {
                       break;
                   case TrackType.INPUTEVENT_INPUT:
                       action = this.replayInput(log);
+                      break;
+                  case TrackType.STATECHANGE:
+                      action = this.replayPageStateChange(log);
                       break;
                   default:
                       break;
@@ -1180,11 +1184,30 @@ var Replay = (function () {
                       inputTarget.value = inputTargetValue || '';
                   }
                   else if (this.checkInputElementType(inputTarget, 'file')) {
-                      // TODO hanle file input type
+                      // TODO handle file input type properly
                       console.log('add file: ', inputTargetValue);
                   }
               };
           }
+      }
+      replayPageStateChange(log) {
+          const { prevState, newState } = log;
+          console.log('this.pageStateElement: ', this.pageStateElement);
+          if (this.pageStateElement === null) {
+              return () => { };
+          }
+          const currentStateElement = this.pageStateElement.querySelector(`.${newState}`);
+          if (currentStateElement === null) {
+              return () => { };
+          }
+          const previousStateElement = this.pageStateElement.querySelector(`.${prevState}`);
+          return () => {
+              console.log('replayPageStateChange');
+              currentStateElement.classList.add('current-active');
+              if (previousStateElement) {
+                  previousStateElement.classList.remove('current-active');
+              }
+          };
       }
   }
 
